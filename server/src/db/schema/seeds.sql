@@ -1,0 +1,1 @@
+INSERT INTO users (username, avatar, twitch_id) VALUES ('jenskarlsen', 'https://static-cdn.jtvnw.net/jtv_user_pictures/1d6dd937-9101-4719-a4aa-ff6971f16432-profile_image-300x300.png', '55611234');
