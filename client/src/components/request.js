@@ -112,6 +112,7 @@ const Request = ({
   type,
   username,
   description,
+  link,
   created_at,
   accepted_at,
   completed_at,
@@ -139,7 +140,9 @@ const Request = ({
       </Body>
       <Footer>
         @{username}
-        <CodeIcon />
+        <a href={link} target="_blanks">
+          <CodeIcon />
+        </a>
       </Footer>
     </RequestContainer>
   );

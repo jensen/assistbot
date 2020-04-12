@@ -26,7 +26,7 @@ axios.defaults.baseURL = process.env.API_BASE_URL;
 
 client.connect();
 
-const createRequest = (type, id) => {
+const createRequest = (type, id, args) => {
   return axios.get(`/users/${id}/requests`).then(({ data }) => {
     if (data.exists) {
       return "You already have an assitance request, let's finish it before adding another one";
@@ -35,6 +35,7 @@ const createRequest = (type, id) => {
     return axios
       .post("/requests", {
         twitchid: id,
+        link: args[0],
         type,
       })
       .then((response) => {
@@ -44,8 +45,8 @@ const createRequest = (type, id) => {
 };
 
 const commands = {
-  "!debug": (id, args) => createRequest("debug", id),
-  "!review": (id, args) => createRequest("review", id),
+  "!debug": (id, args) => createRequest("debug", id, args),
+  "!review": (id, args) => createRequest("review", id, args),
 };
 
 client.on("connected", (address, port) => {

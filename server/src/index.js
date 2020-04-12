@@ -19,7 +19,7 @@ app.use(bodyparser.json());
 app.post("/requests", (request, response) => {
   addUser(request.body.twitchid)
     .then((user) => {
-      return addRequest(user.id, request.body.type);
+      return addRequest(user.id, request.body.type, request.body.link);
     })
     .then(() => {
       response.json({ success: true });
@@ -83,6 +83,7 @@ app.get("/requests/:timestamp", (request, response) => {
     SELECT
       requests.id,
       requests.description,
+      requests.link,
       requests.type,
       requests.created_at,
       requests.accepted_at,
@@ -104,6 +105,7 @@ app.get("/requests", (request, response) => {
       requests.id,
       requests.description,
       requests.type,
+      requests.link,
       requests.created_at,
       requests.accepted_at,
       requests.completed_at,

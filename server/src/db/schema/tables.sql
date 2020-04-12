@@ -12,6 +12,7 @@ CREATE TABLE requests (
   id SERIAL PRIMARY KEY,
   description TEXT,
   type VARCHAR(32),
+  link VARCHAR(255),
   created_at TIMESTAMP DEFAULT (now() AT TIME ZONE 'utc'),
   updated_at TIMESTAMP DEFAULT (now() AT TIME ZONE 'utc'),
   accepted_at TIMESTAMP,

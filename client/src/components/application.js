@@ -78,6 +78,14 @@ function Application() {
   }, []);
 
   useEffect(() => {
+    const timeout = setTimeout(
+      () => setState((prev) => ({ ...prev })),
+      10 * 1000
+    );
+    return () => clearTimeout(timeout);
+  }, [state]);
+
+  useEffect(() => {
     const interval = setInterval(
       () =>
         axios.get(`/requests/${state.timestamp}`).then(({ data }) => {
