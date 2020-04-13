@@ -1,5 +1,5 @@
 const db = require("../connect");
-const { twitchRequest } = require("./api");
+const { twitchRequest } = require("../../helpers/api");
 
 const addUser = (id) =>
   db

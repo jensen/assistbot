@@ -27,23 +27,36 @@ axios.defaults.baseURL = process.env.API_BASE_URL;
 client.connect();
 
 const createRequest = (type, id, args) => {
-  return axios.get(`/users/${id}/requests`).then(({ data }) => {
-    if (data.exists) {
-      return "You already have an assitance request, let's finish it before adding another one";
-    }
+  return axios
+    .get(`/users/${id}/requests`)
+    .then(({ data }) => {
+      if (data.exists) {
+        return "You already have an assitance request, let's finish it before adding another one";
+      }
 
-    return axios
-      .post("/requests", {
-        twitchid: id,
-        link: args[0],
-        type,
-      })
-      .then((response) => {
-        return "You are now in the assitance request queue";
-      });
-  });
+      const link = args[0] || null;
+
+      /*
+        TODO: should only accept links from approved
+        hosts (github, pastebin, fiddle)
+      */
+      return axios
+        .post("/requests", {
+          twitchid: id,
+          link: link && (link.startsWith("http:") ? link : `https:${link}`),
+          type,
+        })
+        .then((response) => {
+          return "You are now in the assitance request queue";
+        });
+    })
+    .catch((error) => console.log(error));
 };
 
+/*
+  TODO:
+    - !help should provide a whisper to the user with usage details
+*/
 const commands = {
   "!debug": (id, args) => createRequest("debug", id, args),
   "!review": (id, args) => createRequest("review", id, args),
