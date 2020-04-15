@@ -1,0 +1,41 @@
+version: "3.7"
+services:
+  nginx:
+    build: ./config/nginx
+    ports:
+      - "8080:80"
+    networks:
+      - app-network
+    depends_on:
+      - app
+  app:
+    build: "."
+    volumes:
+      - application-logs:/root/.pm2/logs
+    networks:
+      - app-network
+      - db-network
+    depends_on:
+      - db
+    env_file:
+      - ./config/app/app.env
+  db:
+    image: postgres:12.2
+    restart: always
+    ports:
+      - "5433:5432"
+    env_file:
+      - ./config/postgres/pg.env
+    volumes:
+      - database-data:/var/lib/postgresql/data/
+      - ./server/src/db/schema:/docker-entrypoint-initdb.d
+    networks:
+      - db-network
+volumes:
+  database-data:
+  application-logs:
+networks:
+  app-network:
+    driver: bridge
+  db-network:
+    driver: bridge

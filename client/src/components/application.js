@@ -6,7 +6,9 @@ import RequestList from "components/request-list";
 import useRequests from "hooks/use-requests";
 import { makeList } from "utils/serialization";
 
-axios.defaults.baseURL = "http://localhost:3001";
+if (process.env.NODE_ENV === "development" && process.env.REACT_APP_API_URL) {
+  axios.defaults.baseURL = process.env.REACT_APP_API_URL;
+}
 
 const Container = styled.main`
   height: 100%;

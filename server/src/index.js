@@ -1,4 +1,7 @@
-require("dotenv").config();
+const path = require("path");
+const dotenv = require("dotenv");
+
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const bodyparser = require("body-parser");
 const express = require("express");
@@ -17,4 +20,4 @@ app.use(bodyparser.json());
 app.use("/users", userRoutes);
 app.use("/requests", requestRoutes);
 
-app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+app.listen(PORT, "0.0.0.0", () => console.log(`Listening on port ${PORT}`));

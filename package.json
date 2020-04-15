@@ -1,0 +1,21 @@
+{
+  "name": "assistbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "pm2 start ./config/services.config.js --only bot,api",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jensen/twitchbot.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jensen/twitchbot/issues"
+  },
+  "homepage": "https://github.com/jensen/twitchbot#readme",
+  "devDependencies": {}
+}

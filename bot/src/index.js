@@ -1,4 +1,5 @@
-require("dotenv").config();
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
 const tmi = require("tmi.js");
 const axios = require("axios");
@@ -9,10 +10,10 @@ const client = new tmi.Client({
     reconnect: true,
   },
   identity: {
-    username: "jenskarlsenbot",
+    username: process.env.TWITCH_OAUTH_USERNAME,
     password: process.env.TWITCH_OAUTH_TOKEN,
   },
-  channels: ["jenskarlsen"],
+  channels: [process.env.TWITCH_CHANNEL],
 });
 
 const nightbot = [
