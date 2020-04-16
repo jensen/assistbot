@@ -84,7 +84,7 @@ const Request = ({
       </Body>
       <Footer>
         @{username}
-        <a href={link} target="_blanks">
+        <a href={link} target="_blank" rel="noopener noreferrer">
           <CodeIcon />
         </a>
       </Footer>

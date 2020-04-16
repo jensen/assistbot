@@ -44,7 +44,7 @@ const createRequest = (type, id, args) => {
       return axios
         .post("/requests", {
           twitchid: id,
-          link: link && (link.startsWith("http:") ? link : `https:${link}`),
+          link: link && (link.startsWith("http") ? link : `https://${link}`),
           type,
         })
         .then((response) => {
