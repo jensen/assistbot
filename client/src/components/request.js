@@ -5,6 +5,7 @@ import Avatar from "components/avatar";
 import DateDisplay from "components/date";
 import { TypeIcon } from "components/icons";
 import { separateUrls } from "utils/url";
+import { fadeIntoTime } from "utils/date";
 
 const statusLookup = {
   created: "#A03333",
@@ -16,6 +17,7 @@ const RequestContainer = styled.li`
   width: 100%;
   margin-bottom: 1rem;
   border-radius: 0.5rem;
+  opacity: ${({ opacity }) => opacity};
 `;
 
 const Header = styled.header`
@@ -112,7 +114,7 @@ const Request = ({
   );
 
   return (
-    <RequestContainer>
+    <RequestContainer opacity={fadeIntoTime(completed_at)}>
       <Header status={status} onClick={updateStatus}>
         <TypeIcon type={type} />
         <CreationTime>

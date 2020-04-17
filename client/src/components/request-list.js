@@ -1,6 +1,9 @@
 import React from "react";
 import styled from "styled-components";
 import Request from "components/request";
+import { sortRequests } from "hooks/use-requests";
+import { useSlowTicker } from "hooks/use-ticker";
+import { getIsExpired } from "utils/date";
 
 const RequestListPositioned = styled.div`
   position: relative;
@@ -20,57 +23,19 @@ const RequestListContainer = styled.ul`
   list-style: none;
 `;
 
-function checkDate(a, b) {
-  const leftDate = new Date(a);
-  const rightDate = new Date(b);
-
-  if (leftDate < rightDate) {
-    return -1;
-  }
-
-  if (leftDate > rightDate) {
-    return 1;
-  }
-
-  return 0;
-}
-
-function getStatus(request) {
-  if (request.accepted_at === undefined || request.completed_at === undefined) {
-    throw new Error("Request must have accepted_at and created_at properties");
-  }
-
-  if (request.accepted_at && request.completed_at === null) {
-    return 0;
-  }
-
-  if (request.accepted_at === null && request.completed_at === null) {
-    return 1;
-  }
-
-  if (request.accepted_at && request.completed_at) {
-    return 2;
-  }
-}
-
-function sort(list) {
-  return list.sort((a, b) => {
-    if (getStatus(a) < getStatus(b)) {
-      return -1;
-    }
-    if (getStatus(a) > getStatus(b)) {
-      return 1;
-    }
-
-    return checkDate(a.created_at, b.created_at);
-  });
-}
-
 const RequestList = ({ requests, updateStatus }) => {
+  /* update the component every couple of seconds so that
+     relative times are accurate */
+  useSlowTicker();
+
   return (
     <RequestListPositioned>
       <RequestListContainer>
-        {sort(requests).map((request) => (
+        {sortRequests(
+          requests.filter(
+            (request) => getIsExpired(request.completed_at) === false
+          )
+        ).map((request) => (
           <Request
             key={`${request.id}-${request.created_at}`}
             {...request}
