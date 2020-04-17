@@ -80,6 +80,9 @@ client.on("message", (channel, tags, message, self) => {
   if (message.startsWith("!")) {
     const [command, ...args] = message.split(" ");
 
+    if (args.length === 0)
+      return client.say(channel, "Must include a description for the request");
+
     if (commands[command]) {
       if (typeof commands[command] === "function") {
         return commands[command](tags["user-id"], args.join(" ")).then(
