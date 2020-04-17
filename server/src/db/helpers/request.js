@@ -1,9 +1,9 @@
 const db = require("../connect");
 
-const addRequest = (usersId, type, link) => {
+const addRequest = (usersId, type, description, link) => {
   return db.query(
-    "INSERT INTO requests (users_id, type, link) VALUES ($1, $2, $3) RETURNING *",
-    [usersId, type, link]
+    "INSERT INTO requests (users_id, type, description, link) VALUES ($1, $2, $3, $4) RETURNING *",
+    [usersId, type, description, link]
   );
 };
 

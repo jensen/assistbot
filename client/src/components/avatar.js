@@ -8,6 +8,7 @@ const Image = styled.img`
   border: 2px solid #282828;
   background-color: #141414;
   margin-bottom: 0.5rem;
+  flex-shrink: 0;
 `;
 
 const Avatar = ({ avatar }) => {

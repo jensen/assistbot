@@ -47,7 +47,14 @@ router.get("/:timestamp", (request, response) => {
 
 router.post("/", (request, response) => {
   addUser(request.body.twitchid)
-    .then((user) => addRequest(user.id, request.body.type, request.body.link))
+    .then((user) =>
+      addRequest(
+        user.id,
+        request.body.type,
+        request.body.description,
+        request.body.link
+      )
+    )
     .then(() => response.json({ success: true }))
     .catch((error) => response.json({ success: false, error }));
 });
