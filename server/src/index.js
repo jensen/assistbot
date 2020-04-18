@@ -10,6 +10,7 @@ const app = express();
 
 const userRoutes = require("./routes/users");
 const requestRoutes = require("./routes/requests");
+const messageRoutes = require("./routes/messages");
 
 const PORT = process.env.PORT;
 
@@ -19,5 +20,6 @@ app.use(bodyparser.json());
 
 app.use("/users", userRoutes);
 app.use("/requests", requestRoutes);
+app.use("/messages", messageRoutes);
 
 app.listen(PORT, "0.0.0.0", () => console.log(`Listening on port ${PORT}`));

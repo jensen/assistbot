@@ -122,7 +122,7 @@ const Request = ({
         </CreationTime>
       </Header>
       <Body>
-        <Avatar avatar={avatar} />
+        <Avatar size="64" avatar={avatar} />
         <Description>{separatedDescription}</Description>
       </Body>
       <Footer>@{username}</Footer>

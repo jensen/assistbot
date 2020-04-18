@@ -61,13 +61,31 @@ const createRequest = (type, id, args) => {
     .catch((error) => console.log(error));
 };
 
+const logMessage = (id, message) => {
+  return axios
+    .post("/messages", {
+      twitchid: id,
+      message,
+    })
+    .catch((error) => console.log(error));
+};
+
 /*
   TODO:
     - !help should provide a whisper to the user with usage details
+    - !project should provide information about the current project
+    - !github should provide a link to gihub profile
 */
 const commands = {
   "!debug": (id, args) => createRequest("debug", id, args),
   "!review": (id, args) => createRequest("review", id, args),
+  "!github": "https://github.com/jensen/",
+  "!project":
+    "Currently working on a request assistance queue for the channel. The code is located at https://github.com/jensen/assistbot",
+  "!theme":
+    "The VSCode theme is Horizon. https://marketplace.visualstudio.com/items?itemName=Bauke.horizon-vscode",
+  "!font":
+    "The font is called Fira Code, and ligatures are enabled. https://github.com/tonsky/FiraCode",
 };
 
 client.on("connected", (address, port) => {
@@ -77,14 +95,19 @@ client.on("connected", (address, port) => {
 client.on("message", (channel, tags, message, self) => {
   if (self) return;
 
+  logMessage(tags["user-id"], message);
+
   if (message.startsWith("!")) {
     const [command, ...args] = message.split(" ");
 
-    if (args.length === 0)
-      return client.say(channel, "Must include a description for the request");
-
     if (commands[command]) {
       if (typeof commands[command] === "function") {
+        if (args.length === 0)
+          return client.say(
+            channel,
+            "Must include a description for the request"
+          );
+
         return commands[command](tags["user-id"], args.join(" ")).then(
           (message) => {
             client.say(channel, message);

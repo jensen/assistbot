@@ -1,10 +1,8 @@
-import React, { useEffect } from "react";
+import React from "react";
 import axios from "axios";
 import styled from "styled-components";
 import Logo from "components/logo";
-import RequestList from "components/request-list";
-import useRequests from "hooks/use-requests";
-import { makeList } from "utils/serialization";
+import ChatPage from "pages/chat";
 
 if (process.env.NODE_ENV === "development" && process.env.REACT_APP_API_URL) {
   axios.defaults.baseURL = process.env.REACT_APP_API_URL;
@@ -38,46 +36,18 @@ const SideBar = styled.div`
   border-right: 1px solid #282828;
 `;
 
+const Content = styled.div`
+  width: 100%;
+  height: 100%;
+`;
+
+const Positioned = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
+`;
+
 function Application() {
-  const {
-    state,
-    initializeRequests,
-    updateRequests,
-    updateRequest,
-  } = useRequests();
-
-  useEffect(() => {
-    axios.get("/requests").then(({ data }) => initializeRequests(data));
-  }, [initializeRequests]);
-
-  useEffect(() => {
-    const interval = setInterval(
-      () =>
-        axios.get(`/requests/${state.timestamp}`).then(({ data }) => {
-          if (data.length > 0) {
-            updateRequests(data);
-          }
-        }),
-      5000
-    );
-
-    return () => clearInterval(interval);
-  }, [state.timestamp, updateRequests]);
-
-  const updateStatus = ({ id, accepted_at, completed_at }) => {
-    if (!accepted_at) {
-      return axios
-        .put(`/requests/${id}/accepted`)
-        .then(({ data }) => updateRequest(data));
-    }
-
-    if (!completed_at) {
-      return axios
-        .put(`/requests/${id}/completed`)
-        .then(({ data }) => updateRequest(data));
-    }
-  };
-
   return (
     <Container>
       <Header>
@@ -85,10 +55,15 @@ function Application() {
       </Header>
       <Body>
         <SideBar />
-        <RequestList
+        {/* <RequestList
           requests={makeList(state.requests)}
           updateStatus={updateStatus}
-        />
+        /> */}
+        <Content>
+          <Positioned>
+            <ChatPage />
+          </Positioned>
+        </Content>
       </Body>
     </Container>
   );

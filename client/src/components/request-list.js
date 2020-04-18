@@ -1,9 +1,10 @@
 import React from "react";
 import styled from "styled-components";
 import Request from "components/request";
-import { sortRequests } from "hooks/use-requests";
+import useRequests, { sortRequests } from "hooks/use-requests";
 import { useSlowTicker } from "hooks/use-ticker";
 import { getIsExpired } from "utils/date";
+import RequestList from "components/request-list";
 
 const RequestListPositioned = styled.div`
   position: relative;
@@ -24,6 +25,45 @@ const RequestListContainer = styled.ul`
 `;
 
 const RequestList = ({ requests, updateStatus }) => {
+  const {
+    state,
+    initializeRequests,
+    updateRequests,
+    updateRequest,
+  } = useRequests();
+
+  useEffect(() => {
+    axios.get("/requests").then(({ data }) => initializeRequests(data));
+  }, [initializeRequests]);
+
+  useEffect(() => {
+    const interval = setInterval(
+      () =>
+        axios.get(`/requests/${state.timestamp}`).then(({ data }) => {
+          if (data.length > 0) {
+            updateRequests(data);
+          }
+        }),
+      5000
+    );
+
+    return () => clearInterval(interval);
+  }, [state.timestamp, updateRequests]);
+
+  const updateStatus = ({ id, accepted_at, completed_at }) => {
+    if (!accepted_at) {
+      return axios
+        .put(`/requests/${id}/accepted`)
+        .then(({ data }) => updateRequest(data));
+    }
+
+    if (!completed_at) {
+      return axios
+        .put(`/requests/${id}/completed`)
+        .then(({ data }) => updateRequest(data));
+    }
+  };
+
   /* update the component every couple of seconds so that
      relative times are accurate */
   useSlowTicker();

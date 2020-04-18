@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS requests CASCADE;
+DROP TABLE IF EXISTS messages CASCADE;
 
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
@@ -18,6 +19,13 @@ CREATE TABLE requests (
   accepted_at TIMESTAMP,
   completed_at TIMESTAMP,
   users_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE messages (
+  id SERIAL PRIMARY KEY,
+  message TEXT,
+  created_at TIMESTAMP DEFAULT (now() AT TIME ZONE 'utc'),
+  users_id  INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE OR REPLACE FUNCTION trigger_set_timestamp()
