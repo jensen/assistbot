@@ -1,8 +1,11 @@
 import React from "react";
+import { Route } from "react-router-dom";
 import axios from "axios";
 import styled from "styled-components";
 import Logo from "components/logo";
+import SideBar from "components/sidebar";
 import ChatPage from "pages/chat";
+import QueuePage from "pages/queue";
 
 if (process.env.NODE_ENV === "development" && process.env.REACT_APP_API_URL) {
   axios.defaults.baseURL = process.env.REACT_APP_API_URL;
@@ -29,13 +32,6 @@ const Body = styled.section`
   display: flex;
 `;
 
-const SideBar = styled.div`
-  width: 64px;
-  height: 100%;
-  background-color: #141414;
-  border-right: 1px solid #282828;
-`;
-
 const Content = styled.div`
   width: 100%;
   height: 100%;
@@ -50,18 +46,17 @@ const Positioned = styled.div`
 function Application() {
   return (
     <Container>
-      <Header>
-        <Logo />
-      </Header>
+      <Header></Header>
       <Body>
         <SideBar />
-        {/* <RequestList
-          requests={makeList(state.requests)}
-          updateStatus={updateStatus}
-        /> */}
         <Content>
           <Positioned>
-            <ChatPage />
+            <Route path="/chat">
+              <ChatPage />
+            </Route>
+            <Route path="/queue">
+              <QueuePage />
+            </Route>
           </Positioned>
         </Content>
       </Body>

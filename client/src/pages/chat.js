@@ -1,8 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import styled from "styled-components";
-import axios from "axios";
 import Message from "components/message";
-import useMessages from "hooks/use-messages";
+import useMessages, { groupMessagesByUser } from "hooks/use-messages";
 import { makeList } from "utils/serialization";
 
 const MessageList = styled.ul`
@@ -16,41 +15,8 @@ const MessageList = styled.ul`
   padding: 1rem;
 `;
 
-const group = (list) =>
-  list.reduce((groups, message) => {
-    if (groups.length > 0) {
-      const last = groups[groups.length - 1];
-
-      if (last.username === message.username) {
-        return [
-          ...groups.slice(0, groups.length - 1),
-          { ...last, messages: [...last.messages, message.message] },
-        ];
-      }
-
-      return [
-        ...groups,
-        {
-          ...message,
-          messages: [message.message],
-        },
-      ];
-    }
-
-    return [
-      {
-        ...message,
-        messages: [message.message],
-      },
-    ];
-  }, []);
-
 const ChatPage = () => {
-  const { state, initializeMessages, addMessages } = useMessages();
-
-  useEffect(() => {
-    axios.get("/messages").then(({ data }) => initializeMessages(data));
-  }, [initializeMessages]);
+  const { state } = useMessages();
 
   const scrollRef = useRef(null);
 
@@ -62,7 +28,7 @@ const ChatPage = () => {
 
   return (
     <MessageList>
-      {group(makeList(state.messages))
+      {groupMessagesByUser(makeList(state.messages))
         .sort((a, b) => new Date(a.date) - new Date(b.date))
         .map((message, index) => (
           <Message alternate={index % 2 === 0} {...message} />

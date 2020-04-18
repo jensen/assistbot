@@ -25,6 +25,35 @@ function reducer(state, action) {
   throw new Error("Type not handled by reducer");
 }
 
+export const groupMessagesByUser = (list) =>
+  list.reduce((groups, message) => {
+    if (groups.length > 0) {
+      const last = groups[groups.length - 1];
+
+      if (last.username === message.username) {
+        return [
+          ...groups.slice(0, groups.length - 1),
+          { ...last, messages: [...last.messages, message.message] },
+        ];
+      }
+
+      return [
+        ...groups,
+        {
+          ...message,
+          messages: [message.message],
+        },
+      ];
+    }
+
+    return [
+      {
+        ...message,
+        messages: [message.message],
+      },
+    ];
+  }, []);
+
 export default () => {
   const [state, dispatch] = useReducer(reducer, { timestamp: 0, messages: {} });
 
@@ -37,6 +66,10 @@ export default () => {
     (messages) => dispatch({ type: "ADD_MESSAGES", messages }),
     []
   );
+
+  useEffect(() => {
+    axios.get("/messages").then(({ data }) => initializeMessages(data));
+  }, [initializeMessages]);
 
   useEffect(() => {
     const interval = setInterval(

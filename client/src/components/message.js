@@ -46,7 +46,7 @@ const UserName = styled.span`
 
 const MessageGroup = ({ username, avatar, messages, alternate }) => {
   return (
-    <MessageContainer>
+    <MessageContainer alternate={alternate}>
       <MessageHeader alternate={alternate}>
         <Avatar size="24" avatar={avatar} />
         <UserName>{username}</UserName>

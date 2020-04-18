@@ -1,15 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
+import axios from "axios";
 import styled from "styled-components";
 import Request from "components/request";
 import useRequests, { sortRequests } from "hooks/use-requests";
 import { useSlowTicker } from "hooks/use-ticker";
 import { getIsExpired } from "utils/date";
-import RequestList from "components/request-list";
-
-const RequestListPositioned = styled.div`
-  position: relative;
-  width: 100%;
-`;
+import { makeList } from "utils/serialization";
 
 const RequestListContainer = styled.ul`
   position: absolute;
@@ -20,11 +16,9 @@ const RequestListContainer = styled.ul`
   overflow: none;
   overflow-y: auto;
   padding: 1rem;
-  margin: 0;
-  list-style: none;
 `;
 
-const RequestList = ({ requests, updateStatus }) => {
+const Queue = () => {
   const {
     state,
     initializeRequests,
@@ -69,22 +63,20 @@ const RequestList = ({ requests, updateStatus }) => {
   useSlowTicker();
 
   return (
-    <RequestListPositioned>
-      <RequestListContainer>
-        {sortRequests(
-          requests.filter(
-            (request) => getIsExpired(request.completed_at) === false
-          )
-        ).map((request) => (
-          <Request
-            key={`${request.id}-${request.created_at}`}
-            {...request}
-            updateStatus={() => updateStatus(request)}
-          />
-        ))}
-      </RequestListContainer>
-    </RequestListPositioned>
+    <RequestListContainer>
+      {sortRequests(
+        makeList(state.requests).filter(
+          (request) => getIsExpired(request.completed_at) === false
+        )
+      ).map((request) => (
+        <Request
+          key={`${request.id}-${request.created_at}`}
+          {...request}
+          updateStatus={() => updateStatus(request)}
+        />
+      ))}
+    </RequestListContainer>
   );
 };
 
-export default RequestList;
+export default Queue;
