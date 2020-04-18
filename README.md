@@ -1,3 +1,7 @@
+# Assistbot
+
+Assistbot will listen to the chat within a Twitch channel and respond to assistance requests. The assistance requests are queued for the streamer to accept and complete.
+
 ## Prerequisites
 
 - Docker
