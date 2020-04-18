@@ -7,8 +7,6 @@ const SideBarContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1rem;
-  width: 64px;
   height: 100%;
   background-color: #141414;
   border-right: 1px solid #282828;
@@ -16,22 +14,40 @@ const SideBarContainer = styled.div`
 
 const Menu = styled.ul``;
 const MenuItem = styled.li`
-  margin-bottom: 1rem;
+  width: 100%;
+  padding: 1rem 1rem;
+
+  &:hover {
+    background-color: #282828;
+    cursor: pointer;
+  }
+`;
+
+const Separator = styled.div`
+  border-bottom: 1px dashed #282828;
+  width: 100%;
 `;
 
 const SideBar = () => (
   <SideBarContainer>
     <Menu>
-      <MenuItem>
-        <Link to="/chat">
+      <Link to="/chat">
+        <MenuItem>
           <MenuIcon.Chat />
-        </Link>
-      </MenuItem>
-      <MenuItem>
-        <Link to="/queue">
+        </MenuItem>
+      </Link>
+      <Separator />
+      <Link to="/queue">
+        <MenuItem>
           <MenuIcon.Queue />
-        </Link>
-      </MenuItem>
+        </MenuItem>
+      </Link>
+      <Separator />
+      <Link to="/queue/current">
+        <MenuItem>
+          <MenuIcon.InProgress />
+        </MenuItem>
+      </Link>
     </Menu>
   </SideBarContainer>
 );
