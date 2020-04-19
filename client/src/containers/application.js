@@ -1,11 +1,8 @@
 import React from "react";
-import { Route } from "react-router-dom";
 import axios from "axios";
 import styled from "styled-components";
-import Logo from "components/logo";
 import SideBar from "components/sidebar";
-import ChatPage from "pages/chat";
-import QueuePage from "pages/queue";
+import Router from "components/router";
 
 if (process.env.NODE_ENV === "development" && process.env.REACT_APP_API_URL) {
   axios.defaults.baseURL = process.env.REACT_APP_API_URL;
@@ -27,7 +24,6 @@ const Header = styled.header`
 `;
 
 const Body = styled.section`
-  background-color: #1c1c1c;
   height: 100%;
   display: flex;
 `;
@@ -51,12 +47,7 @@ function Application() {
         <SideBar />
         <Content>
           <Positioned>
-            <Route path="/chat">
-              <ChatPage />
-            </Route>
-            <Route path="/queue">
-              <QueuePage />
-            </Route>
+            <Router />
           </Positioned>
         </Content>
       </Body>

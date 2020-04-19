@@ -25,6 +25,7 @@ const addUser = (id) =>
         throw new Error("No Twitch user with that ID.");
       });
     })
-    .then(({ rows }) => rows[0]);
+    .then(({ rows }) => rows[0])
+    .catch((error) => console.log(error));
 
 module.exports = { addUser };

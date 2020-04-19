@@ -1,7 +1,7 @@
 import { useReducer, useCallback } from "react";
+import axios from "axios";
 import produce from "immer";
 import { makeHash } from "utils/serialization";
-import { unixTimestamp } from "utils/date";
 
 function checkDate(a, b) {
   const leftDate = new Date(a);
@@ -56,29 +56,19 @@ export const sortRequests = (list) => {
 
 function reducer(state, action) {
   if (action.type === "INITIALIZE_REQUESTS") {
-    const { requests } = action;
-
-    return {
-      timestamp: unixTimestamp(new Date()),
-      requests: makeHash(requests),
-    };
+    return makeHash(action.requests);
   }
 
-  if (action.type === "UPDATE_REQUESTS") {
-    const { requests } = action;
-
-    return {
-      timestamp: unixTimestamp(new Date()),
-      requests: { ...state.requests, ...makeHash(requests) },
-    };
+  if (action.type === "ADD_REQUESTS") {
+    return { ...state, ...makeHash(action.requests) };
   }
 
   if (action.type === "UPDATE_REQUEST") {
     const { request } = action;
 
     return produce(state, (draftState) => {
-      draftState.requests[request.id].accepted_at = request.accepted_at;
-      draftState.requests[request.id].completed_at = request.completed_at;
+      draftState[request.id].accepted_at = request.accepted_at;
+      draftState[request.id].completed_at = request.completed_at;
     });
   }
 
@@ -86,15 +76,15 @@ function reducer(state, action) {
 }
 
 export default () => {
-  const [state, dispatch] = useReducer(reducer, { timestamp: 0, requests: {} });
+  const [state, dispatch] = useReducer(reducer, {});
 
   const initializeRequests = useCallback(
     (requests) => dispatch({ type: "INITIALIZE_REQUESTS", requests }),
     []
   );
 
-  const updateRequests = useCallback(
-    (requests) => dispatch({ type: "UPDATE_REQUESTS", requests }),
+  const addRequests = useCallback(
+    (requests) => dispatch({ type: "ADD_REQUESTS", requests }),
     []
   );
 
@@ -103,10 +93,25 @@ export default () => {
     []
   );
 
+  const updateStatus = ({ id, accepted_at, completed_at }) => {
+    if (!accepted_at) {
+      return axios
+        .put(`/requests/${id}/accepted`)
+        .then(({ data }) => updateRequest(data));
+    }
+
+    if (!completed_at) {
+      return axios
+        .put(`/requests/${id}/completed`)
+        .then(({ data }) => updateRequest(data));
+    }
+  };
+
   return {
     state,
     initializeRequests,
-    updateRequests,
+    addRequests,
     updateRequest,
+    updateStatus,
   };
 };

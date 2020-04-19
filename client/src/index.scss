@@ -10,6 +10,7 @@ html {
   padding: 0;
   font-family: Lato;
   color: #f2f2f2;
+  background-color: #1c1c1c;
 }
 
 body,
@@ -22,4 +23,9 @@ ul {
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
 }

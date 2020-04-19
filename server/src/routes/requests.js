@@ -45,6 +45,51 @@ router.get("/:timestamp", (request, response) => {
   ).then(({ rows }) => response.json(rows));
 });
 
+router.get("/:id/messages", (request, response) => {
+  return db
+    .query(
+      `
+    SELECT 
+      messages.id,
+      messages.message,
+      users.username,
+      users.avatar
+    FROM requests
+    JOIN users ON users.id = requests.users_id
+    JOIN messages ON messages.users_id = requests.users_id
+    WHERE requests.id = $1 AND messages.created_at > requests.accepted_at AND requests.completed_at IS NULL
+    `,
+      [request.params.id]
+    )
+    .then(({ rows }) => response.json(rows));
+});
+
+router.get("/:id/messages/:timestamp", (request, response) => {
+  return db
+    .query(
+      `
+    SELECT 
+      messages.id,
+      messages.message,
+      users.username,
+      users.avatar
+    FROM requests
+    JOIN users ON users.id = requests.users_id
+    JOIN messages ON messages.users_id = requests.users_id
+    WHERE
+      requests.id = $1
+    AND
+      messages.created_at > requests.accepted_at
+    AND
+      requests.completed_at IS NULL
+    AND
+      messages.created_at::timestamp > to_timestamp($2) AT TIME ZONE 'UTC'
+    `,
+      [request.params.id, request.params.timestamp]
+    )
+    .then(({ rows }) => response.json(rows));
+});
+
 router.post("/", (request, response) => {
   addUser(request.body.twitchid)
     .then((user) =>
@@ -58,6 +103,17 @@ router.post("/", (request, response) => {
     .then(() => response.json({ success: true }))
     .catch((error) => response.json({ success: false, error }));
 });
+
+router.get("/:id/messages", (request, response) =>
+  db
+    .query(
+      `
+  SELECT messages.id
+  `,
+      []
+    )
+    .then(({ rows }) => response.json(rows))
+);
 
 router.put("/:id/accepted", (request, response) => {
   db.query(

@@ -42,12 +42,6 @@ const SideBar = () => (
           <MenuIcon.Queue />
         </MenuItem>
       </Link>
-      <Separator />
-      <Link to="/queue/current">
-        <MenuItem>
-          <MenuIcon.InProgress />
-        </MenuItem>
-      </Link>
     </Menu>
   </SideBarContainer>
 );

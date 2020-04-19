@@ -73,8 +73,6 @@ const logMessage = (id, message) => {
 /*
   TODO:
     - !help should provide a whisper to the user with usage details
-    - !project should provide information about the current project
-    - !github should provide a link to gihub profile
 */
 const commands = {
   "!debug": (id, args) => createRequest("debug", id, args),

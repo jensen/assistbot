@@ -30,7 +30,7 @@ const MessageList = styled.ul`
   align-items: ${({ alternate }) => (alternate ? "flex-start" : "flex-end")};
 `;
 
-const Message = styled.div`
+const Message = styled.li`
   color: #ddd;
   border-radius: 0.25rem;
   padding: 0rem 0.5rem;
@@ -44,20 +44,21 @@ const UserName = styled.span`
   padding-right: 0.5rem;
 `;
 
-const MessageGroup = ({ username, avatar, messages, alternate }) => {
-  return (
-    <MessageContainer alternate={alternate}>
-      <MessageHeader alternate={alternate}>
-        <Avatar size="24" avatar={avatar} />
-        <UserName>{username}</UserName>
-      </MessageHeader>
-      <MessageList alternate={alternate}>
-        {messages.map((message) => (
-          <Message alternate={alternate}>{message}</Message>
-        ))}
-      </MessageList>
-    </MessageContainer>
-  );
-};
+const MessageGroup = ({ username, avatar, messages, alternate }) => (
+  <MessageContainer alternate={alternate}>
+    <MessageHeader alternate={alternate}>
+      <Avatar size="24" avatar={avatar} />
+      <UserName>{username}</UserName>
+    </MessageHeader>
+
+    <MessageList alternate={alternate}>
+      {messages.map(({ id, message }) => (
+        <Message key={id} alternate={alternate}>
+          {message}
+        </Message>
+      ))}
+    </MessageList>
+  </MessageContainer>
+);
 
 export default MessageGroup;

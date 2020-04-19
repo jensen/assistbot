@@ -49,7 +49,7 @@ const Description = styled.div`
 const Footer = styled.footer`
   border-bottom-left-radius: 0.5rem;
   border-bottom-right-radius: 0.5rem;
-  padding: 0 1rem 1rem 1rem;
+  padding: 1rem;
   background-color: #222;
   color: #f2f2f2;
   font-weight: 700;

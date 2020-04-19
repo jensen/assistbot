@@ -1,8 +1,8 @@
-import React, { useEffect } from "react";
-import axios from "axios";
+import React from "react";
 import styled from "styled-components";
 import Request from "components/request";
 import useRequests, { sortRequests } from "hooks/use-requests";
+import useLiveApi from "hooks/use-live-api";
 import { useSlowTicker } from "hooks/use-ticker";
 import { getIsExpired } from "utils/date";
 import { makeList } from "utils/serialization";
@@ -16,47 +16,18 @@ const RequestListContainer = styled.ul`
   overflow: none;
   overflow-y: auto;
   padding: 1rem;
+  scrollbar-width: none;
 `;
 
 const Queue = () => {
   const {
     state,
     initializeRequests,
-    updateRequests,
-    updateRequest,
+    addRequests,
+    updateStatus,
   } = useRequests();
 
-  useEffect(() => {
-    axios.get("/requests").then(({ data }) => initializeRequests(data));
-  }, [initializeRequests]);
-
-  useEffect(() => {
-    const interval = setInterval(
-      () =>
-        axios.get(`/requests/${state.timestamp}`).then(({ data }) => {
-          if (data.length > 0) {
-            updateRequests(data);
-          }
-        }),
-      5000
-    );
-
-    return () => clearInterval(interval);
-  }, [state.timestamp, updateRequests]);
-
-  const updateStatus = ({ id, accepted_at, completed_at }) => {
-    if (!accepted_at) {
-      return axios
-        .put(`/requests/${id}/accepted`)
-        .then(({ data }) => updateRequest(data));
-    }
-
-    if (!completed_at) {
-      return axios
-        .put(`/requests/${id}/completed`)
-        .then(({ data }) => updateRequest(data));
-    }
-  };
+  useLiveApi("/requests", initializeRequests, addRequests);
 
   /* update the component every couple of seconds so that
      relative times are accurate */
@@ -65,7 +36,7 @@ const Queue = () => {
   return (
     <RequestListContainer>
       {sortRequests(
-        makeList(state.requests).filter(
+        makeList(state).filter(
           (request) => getIsExpired(request.completed_at) === false
         )
       ).map((request) => (

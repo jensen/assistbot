@@ -1,7 +1,8 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import styled from "styled-components";
 import Message from "components/message";
 import useMessages, { groupMessagesByUser } from "hooks/use-messages";
+import useLiveApi from "hooks/use-live-api";
 import { makeList } from "utils/serialization";
 
 const MessageList = styled.ul`
@@ -12,26 +13,38 @@ const MessageList = styled.ul`
   bottom: 0;
   overflow: none;
   overflow-y: auto;
-  padding: 1rem;
+  padding: 1rem 1rem 0 1rem;
+  scrollbar-width: none;
 `;
 
 const ChatPage = () => {
-  const { state } = useMessages();
+  const { state, initializeMessages, addMessages } = useMessages();
+  const { loading } = useLiveApi("/messages", initializeMessages, addMessages);
+
+  const [firstScroll, setFirstScroll] = useState(true);
 
   const scrollRef = useRef(null);
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollIntoView({ behavior: "smooth" });
+      scrollRef.current.scrollIntoView({
+        behavior: firstScroll ? "auto" : "smooth",
+      });
     }
-  }, [state.messages]);
+  }, [state, firstScroll]);
+
+  useEffect(() => {
+    if (!loading) {
+      setFirstScroll(false);
+    }
+  }, [loading]);
 
   return (
     <MessageList>
-      {groupMessagesByUser(makeList(state.messages))
+      {groupMessagesByUser(makeList(state))
         .sort((a, b) => new Date(a.date) - new Date(b.date))
         .map((message, index) => (
-          <Message alternate={index % 2 === 0} {...message} />
+          <Message key={message.id} alternate={index % 2 === 0} {...message} />
         ))}
       <div ref={scrollRef}></div>
     </MessageList>
