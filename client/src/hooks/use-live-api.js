@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { subDays } from "date-fns";
 import { unixTimestamp } from "utils/date";
 
 export default (endpoint, initialize, add) => {
@@ -7,11 +8,13 @@ export default (endpoint, initialize, add) => {
   const [timestamp, setTimestamp] = useState(unixTimestamp(new Date()));
 
   useEffect(() => {
-    axios.get(endpoint).then(({ data }) => {
-      initialize(data);
-      setTimestamp(unixTimestamp(new Date()));
-      setLoading(false);
-    });
+    axios
+      .get(`${endpoint}/${unixTimestamp(subDays(new Date(), 1))}`)
+      .then(({ data }) => {
+        initialize(data);
+        setTimestamp(unixTimestamp(new Date()));
+        setLoading(false);
+      });
   }, [initialize, endpoint]);
 
   useEffect(() => {
