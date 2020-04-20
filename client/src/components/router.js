@@ -8,7 +8,7 @@ const Router = () => (
     <Route path="/chat">
       <ChatPage />
     </Route>
-    <Route exact path="/queue">
+    <Route path="/queue">
       <QueuePage />
     </Route>
   </>
