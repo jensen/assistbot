@@ -25,23 +25,17 @@ export const splitMessage = (message, emotes) => {
         ];
       }
 
-      if (index === emotes.length - 1) {
-        return [
-          ...split,
-          image,
-          {
-            type: "text",
-            value: message.substring(emote.end + 1),
-          },
-        ];
-      }
-
       return [
         ...split,
         image,
         {
           type: "text",
-          value: message.substring(emote.end + 1, emotes[index + 1].start),
+          value: message.substring(
+            emote.end + 1,
+            index === emotes.length - 1
+              ? message.length
+              : emotes[index + 1].start
+          ),
         },
       ];
     }, [])
