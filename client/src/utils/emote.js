@@ -1,34 +1,30 @@
 export const splitMessage = (message, emotes) => {
-  return emotes
-    .sort((a, b) => a.start - b.start)
-    .reduce((split, emote, index) => {
-      const image = {
-        type: "image",
-        value: emote.src,
-      };
+  const split = [];
 
-      if (
-        (index === 0 && emote.start === 0) ||
-        (index === emotes.length - 1 && emote.end === emotes.length - 1)
-      ) {
-        return [...split, image];
-      }
+  emotes = [...emotes].sort((a, b) => a.start - b.start);
 
+  for (let index = 0; index < emotes.length; index++) {
+    const emote = emotes[index];
+    const image = {
+      type: "image",
+      value: emote.src,
+    };
+
+    if (
+      (index === 0 && emote.start === 0) ||
+      (index === emotes.length - 1 && emote.end === emotes.length - 1)
+    ) {
+      split.push(image);
+    } else {
       if (index === 0) {
-        return [
-          ...split,
-          {
-            type: "text",
-            value: message.substring(0, emote.start),
-          },
-          image,
-        ];
-      }
-
-      return [
-        ...split,
-        image,
-        {
+        split.push({
+          type: "text",
+          value: message.substring(0, emote.start),
+        });
+        split.push(image);
+      } else {
+        split.push(image);
+        split.push({
           type: "text",
           value: message.substring(
             emote.end + 1,
@@ -36,10 +32,12 @@ export const splitMessage = (message, emotes) => {
               ? message.length
               : emotes[index + 1].start
           ),
-        },
-      ];
-    }, [])
-    .filter((item) => item.value && item.value !== " ");
+        });
+      }
+    }
+  }
+
+  return split.filter((emote) => emote.value && emote.value !== " ");
 };
 
 export const convertTwitchEmotes = (emotes) => {
