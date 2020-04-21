@@ -23,6 +23,7 @@ CREATE TABLE requests (
 
 CREATE TABLE messages (
   id SERIAL PRIMARY KEY,
+  emotes TEXT,
   message TEXT,
   created_at TIMESTAMP DEFAULT (now() AT TIME ZONE 'utc'),
   users_id  INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE

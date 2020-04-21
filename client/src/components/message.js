@@ -1,6 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 import Avatar from "components/avatar";
+import { splitMessage, convertTwitchEmotes } from "utils/emote";
 
 const MessageContainer = styled.li`
   background-color: #222222;
@@ -44,6 +45,18 @@ const UserName = styled.span`
   padding-right: 0.5rem;
 `;
 
+const MessageWithEmotes = ({ message, emotes }) => {
+  const messageWithEmotes = splitMessage(message, convertTwitchEmotes(emotes));
+
+  return (
+    <div>
+      {messageWithEmotes.map((part) =>
+        part.type === "image" ? <img src={part.value} /> : part.value
+      )}
+    </div>
+  );
+};
+
 const MessageGroup = ({ username, avatar, messages, alternate }) => (
   <MessageContainer alternate={alternate}>
     <MessageHeader alternate={alternate}>
@@ -52,9 +65,13 @@ const MessageGroup = ({ username, avatar, messages, alternate }) => (
     </MessageHeader>
 
     <MessageList alternate={alternate}>
-      {messages.map(({ id, message }) => (
+      {messages.map(({ id, message, emotes }) => (
         <Message key={id} alternate={alternate}>
-          {message}
+          {emotes ? (
+            <MessageWithEmotes message={message} emotes={emotes} />
+          ) : (
+            message
+          )}
         </Message>
       ))}
     </MessageList>

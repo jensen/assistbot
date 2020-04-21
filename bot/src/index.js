@@ -54,20 +54,17 @@ const createRequest = (type, id, args) => {
           description: args,
           type,
         })
-        .then((response) => {
-          return "You are now in the assistance request queue";
-        });
+        .then((response) => "You are now in the assistance request queue");
     })
     .catch((error) => console.log(error));
 };
 
-const logMessage = (id, message) => {
-  return axios
-    .post("/messages", {
-      twitchid: id,
-      message,
-    })
-    .catch((error) => console.log(error));
+const logMessage = (tags, message) => {
+  axios.post("/messages", {
+    twitchid: tags["user-id"],
+    emotes: tags["emotes-raw"],
+    message,
+  });
 };
 
 /*
@@ -93,7 +90,7 @@ client.on("connected", (address, port) => {
 client.on("message", (channel, tags, message, self) => {
   if (self) return;
 
-  logMessage(tags["user-id"], message);
+  logMessage(tags, message);
 
   if (message.startsWith("!")) {
     const [command, ...args] = message.split(" ");

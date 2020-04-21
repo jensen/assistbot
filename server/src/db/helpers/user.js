@@ -5,7 +5,7 @@ const addUser = (id) =>
   db
     .query("SELECT * FROM users WHERE twitch_id = $1", [id])
     .then(({ rows }) => {
-      return twitchRequest(`/users?id=${id}`).then((data) => {
+      return twitchRequest(`/users?id=${id}`).then(({ data }) => {
         if (data.length > 0) {
           const { login, profile_image_url } = data[0];
 

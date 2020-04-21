@@ -12,6 +12,7 @@ router.get("/", (request, response) =>
       SELECT
         messages.id AS id,
         messages.message AS message,
+        messages.emotes,
         messages.created_at AS date,
         users.username AS username,
         users.avatar AS avatar
@@ -26,11 +27,12 @@ router.get("/:timestamp", (request, response) => {
   db.query(
     `
       SELECT
-        messages.id AS id,
-        messages.message AS message,
+        messages.id,
+        messages.message,
+        messages.emotes,
         messages.created_at AS date,
-        users.username AS username,
-        users.avatar AS avatar
+        users.username,
+        users.avatar
       FROM messages
       JOIN users ON users.id = messages.users_id
       WHERE messages.created_at::timestamp > to_timestamp($1) AT TIME ZONE 'UTC';
@@ -41,7 +43,9 @@ router.get("/:timestamp", (request, response) => {
 
 router.post("/", (request, response) => {
   addUser(request.body.twitchid)
-    .then((user) => addMessage(user.id, request.body.message))
+    .then((user) =>
+      addMessage(user.id, request.body.message, request.body.emotes)
+    )
     .then(() => response.json({ success: true }))
     .catch((error) => response.json({ success: false, error }));
 });

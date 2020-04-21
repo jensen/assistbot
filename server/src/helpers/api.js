@@ -9,7 +9,7 @@ const twitchRequest = (url) =>
     headers: {
       "Client-ID": process.env.TWITCH_CLIENTID,
     },
-  }).then(({ data }) => data.data);
+  }).then((response) => response.data);
 
 module.exports = {
   twitchRequest,
