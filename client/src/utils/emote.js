@@ -36,25 +36,16 @@ export const splitMessage = (message, emotes) => {
         ];
       }
 
-      const trailingText = message.substring(
-        emote.end + 1,
-        emotes[index + 1].start
-      );
-
-      if (trailingText !== " ") {
-        return [
-          ...split,
-          image,
-          {
-            type: "text",
-            value: trailingText,
-          },
-        ];
-      }
-
-      return [...split, image];
+      return [
+        ...split,
+        image,
+        {
+          type: "text",
+          value: message.substring(emote.end + 1, emotes[index + 1].start),
+        },
+      ];
     }, [])
-    .filter((item) => item.value);
+    .filter((item) => item.value && item.value !== " ");
 };
 
 export const convertTwitchEmotes = (emotes) => {
