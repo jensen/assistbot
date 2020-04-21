@@ -8,9 +8,20 @@ const express = require("express");
 const cors = require("cors");
 
 const { ApolloServer } = require("apollo-server-express");
+const snakeCase = require("lodash/snakeCase");
 
 const app = express();
-const apollo = new ApolloServer({ schema: require("./graphql/schema") });
+const apollo = new ApolloServer({
+  schema: require("./graphql/schema"),
+  fieldResolver: (source, args, contextValue, info) => {
+    if (typeof source === "object" || typeof source === "function") {
+      const property = source[snakeCase(info.fieldName)];
+      return typeof property === "function"
+        ? source[snakeCase(info.fieldName)](args, contextValue, info)
+        : property;
+    }
+  },
+});
 
 const userRoutes = require("./routes/users");
 const requestRoutes = require("./routes/requests");

@@ -1,6 +1,6 @@
-const db = require("../../db/connect");
+const { db } = require("../../db");
 const { makeExecutableSchema } = require("apollo-server-express");
-const { mergeDeepLeft } = require("ramda");
+const merge = require("lodash/merge");
 
 const { types: UserTypes, resolvers: UserResolvers } = require("./user");
 const {
@@ -17,14 +17,23 @@ const QueryType = `
     _empty: String
   }
 `;
+
+const MutationType = `
+  type Mutation {
+    _empty: String
+  }
+`;
+
 const BaseResolvers = {
   Query: {},
 };
 
 module.exports = makeExecutableSchema({
-  typeDefs: [QueryType, UserTypes, RequestTypes, MessageTypes],
-  resolvers: [UserResolvers, RequestResolvers, MessageResolvers].reduce(
-    (all, current) => mergeDeepLeft(all, current),
-    BaseResolvers
+  typeDefs: [QueryType, MutationType, UserTypes, RequestTypes, MessageTypes],
+  resolvers: merge(
+    BaseResolvers,
+    UserResolvers,
+    RequestResolvers,
+    MessageResolvers
   ),
 });

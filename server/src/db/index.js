@@ -9,6 +9,11 @@ const client = new pg.Client();
 */
 pg.types.setTypeParser(1114, (stringValue) => stringValue);
 
+const helpers = {
+  allRows: ({ rows }) => rows,
+  firstRow: ({ rows }) => (rows && rows.length > 0 && result.rows[0]) || null,
+};
+
 (async function () {
   try {
     await client.connect();
@@ -17,4 +22,7 @@ pg.types.setTypeParser(1114, (stringValue) => stringValue);
   }
 })();
 
-module.exports = client;
+module.exports = {
+  db: client,
+  helpers,
+};

@@ -1,5 +1,8 @@
-const db = require("../../db/connect");
-const { allRows, firstRow } = require("../../utils/array");
+const {
+  db,
+  helpers: { allRows, firstRow },
+} = require("../../db");
+const { addMessage } = require("../../db/helpers/message");
 
 const types = `
   extend type Query {
@@ -13,6 +16,10 @@ const types = `
     emotes: String
     createdAt: String
     user: User
+  }
+
+  extend type Mutation {
+    addMessage(userId: ID!, message: String, emotes: String): Message
   }
 `;
 
@@ -40,6 +47,10 @@ const resolvers = {
       db
         .query("SELECT * FROM users WHERE users.id = $1", [parent.users_id])
         .then(firstRow),
+  },
+  Mutation: {
+    addMessage: (parent, { userId, message, emotes }, context, info) =>
+      addMessage(userId, message, emotes),
   },
 };
 

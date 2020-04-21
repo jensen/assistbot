@@ -51,7 +51,11 @@ const MessageWithEmotes = ({ message, emotes }) => {
   return (
     <div>
       {messageWithEmotes.map((part) =>
-        part.type === "image" ? <img src={part.value} /> : part.value
+        part.type === "image" ? (
+          <img src={part.value} alt="Emote" />
+        ) : (
+          part.value
+        )
       )}
     </div>
   );

@@ -1,5 +1,5 @@
 const express = require("express");
-const db = require("../db/connect");
+const { db } = require("../db");
 const { addUser } = require("../db/helpers/user");
 const { addRequest } = require("../db/helpers/request");
 

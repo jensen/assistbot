@@ -1,5 +1,8 @@
-const db = require("../../db/connect");
-const { allRows, firstRow } = require("../../utils/array");
+const {
+  db,
+  helpers: { allRows, firstRow },
+} = require("../../db");
+const { addRequest } = require("../../db/helpers/request");
 
 const types = `
   extend type Query {
@@ -17,6 +20,12 @@ const types = `
     acceptedAt: String
     completedAt: String
     user: User
+  }
+
+  extend type Mutation {
+    addRequest(userId: ID!, type: String, description: String, link: String): Request
+    acceptRequest(id: ID!): Request
+    completeRequest(id: ID!): Request
   }
 `;
 
@@ -43,6 +52,34 @@ const resolvers = {
     user: (parent, args, context, info) =>
       db
         .query("SELECT * FROM users WHERE users.id = $1", [parent.users_id])
+        .then(firstRow),
+  },
+  Mutation: {
+    addRequest: (parent, { userId, type, description, link }, context, info) =>
+      addRequest(userId, type, description, link),
+    acceptRequest: (parent, { id }, context, info) =>
+      db
+        .query(
+          `
+        UPDATE requests
+        SET accepted_at = now() AT TIME ZONE 'utc'
+        WHERE id = $1
+        RETURNING *
+      `,
+          [id]
+        )
+        .then(firstRow),
+    completeRequest: (parent, { id }, context, info) =>
+      db
+        .query(
+          `
+        UPDATE requests
+        SET completed_at = now() AT TIME ZONE 'utc'
+        WHERE id = $1
+        RETURNING *
+      `,
+          [id]
+        )
         .then(firstRow),
   },
 };

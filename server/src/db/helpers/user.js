@@ -1,4 +1,7 @@
-const db = require("../connect");
+const {
+  db,
+  helpers: { firstRow },
+} = require("../");
 const { twitchRequest } = require("../../helpers/api");
 
 const addUser = (id) =>
@@ -25,7 +28,6 @@ const addUser = (id) =>
         throw new Error("No Twitch user with that ID.");
       });
     })
-    .then(({ rows }) => rows[0])
-    .catch((error) => console.log(error));
+    .then(firstRow);
 
 module.exports = { addUser };

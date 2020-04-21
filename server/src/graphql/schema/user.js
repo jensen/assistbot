@@ -1,5 +1,8 @@
-const db = require("../../db/connect");
-const { allRows, firstRow } = require("../../utils/array");
+const {
+  db,
+  helpers: { allRows, firstRow },
+} = require("../../db");
+const { addUser } = require("../../db/helpers/request");
 
 const types = `
   extend type Query {
@@ -11,7 +14,11 @@ const types = `
     id: ID!
     username: String
     avatar: String
-    twitchID: String
+    twitchId: String
+  }
+
+  extend type Mutation {
+    addUser(twitchId: String!): User
   }
 `;
 
@@ -23,6 +30,9 @@ const resolvers = {
       db
         .query("SELECT * FROM users WHERE users.id = $1", [args.id])
         .then(firstRow),
+  },
+  Mutation: {
+    addUser: (parent, { twitchId }, context, info) => addUser(twitchId),
   },
 };
 
