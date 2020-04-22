@@ -59,13 +59,12 @@ const createRequest = (type, id, args) => {
     .catch((error) => console.log(error));
 };
 
-const logMessage = (tags, message) => {
+const logMessage = (tags, message) =>
   axios.post("/messages", {
     twitchid: tags["user-id"],
     emotes: tags["emotes-raw"],
     message,
   });
-};
 
 /*
   TODO:

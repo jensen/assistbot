@@ -96,15 +96,15 @@ const Request = ({
   type,
   username,
   description,
-  created_at,
-  accepted_at,
-  completed_at,
+  createdAt,
+  acceptedAt,
+  completedAt,
   avatar,
   updateStatus,
 }) => {
-  const status = completed_at
+  const status = completedAt
     ? "completed"
-    : accepted_at
+    : acceptedAt
     ? "inprogress"
     : "created";
 
@@ -114,11 +114,11 @@ const Request = ({
   );
 
   return (
-    <RequestContainer opacity={fadeIntoTime(completed_at)}>
+    <RequestContainer opacity={fadeIntoTime(completedAt)}>
       <Header status={status} onClick={updateStatus}>
         <TypeIcon type={type} />
         <CreationTime>
-          <DateDisplay date={created_at} />
+          <DateDisplay date={createdAt} />
         </CreationTime>
       </Header>
       <Body>

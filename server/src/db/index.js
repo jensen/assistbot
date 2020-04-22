@@ -11,7 +11,7 @@ pg.types.setTypeParser(1114, (stringValue) => stringValue);
 
 const helpers = {
   allRows: ({ rows }) => rows,
-  firstRow: ({ rows }) => (rows && rows.length > 0 && result.rows[0]) || null,
+  firstRow: ({ rows }) => (rows && rows.length > 0 && rows[0]) || null,
 };
 
 (async function () {

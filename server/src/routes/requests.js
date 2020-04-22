@@ -104,17 +104,6 @@ router.post("/", (request, response) => {
     .catch((error) => response.json({ success: false, error }));
 });
 
-router.get("/:id/messages", (request, response) =>
-  db
-    .query(
-      `
-  SELECT messages.id
-  `,
-      []
-    )
-    .then(({ rows }) => response.json(rows))
-);
-
 router.put("/:id/accepted", (request, response) => {
   db.query(
     `

@@ -1,0 +1,47 @@
+type Message {
+  id: ID!
+  message: String
+  emotes: String
+  createdAt: String
+  user: User
+}
+
+type Mutation {
+  _empty: String
+  addUser(twitchId: String!): User
+  addRequest(userId: ID!, type: String, description: String, link: String): Request
+  acceptRequest(id: ID!): Request
+  completeRequest(id: ID!): Request
+  addMessage(userId: ID!, message: String, emotes: String): Message
+}
+
+type Query {
+  _empty: String
+  users: [User]
+  user(id: ID!): User
+  requests(from: Int): [Request]
+  request(id: ID, filter: String): Request
+  messages(from: Int): [Message]
+  message(id: ID!): Message
+}
+
+type Request {
+  id: ID!
+  description: String
+  type: String
+  link: String
+  createdAt: String
+  updatedAt: String
+  acceptedAt: String
+  completedAt: String
+  user: User
+  messages: [Message]
+}
+
+type User {
+  id: ID!
+  username: String
+  avatar: String
+  twitchId: String
+}
+
