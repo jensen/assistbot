@@ -38,6 +38,11 @@ type Request {
   messages: [Message]
 }
 
+type Subscription {
+  _empty: String
+  requestAdded: Request
+}
+
 type User {
   id: ID!
   username: String

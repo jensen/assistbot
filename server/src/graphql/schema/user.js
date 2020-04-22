@@ -5,16 +5,16 @@ const {
 const { addUser } = require("../../db/helpers/request");
 
 const types = `
-  extend type Query {
-    users: [User]
-    user(id: ID!): User
-  }
-
   type User {
     id: ID!
     username: String
     avatar: String
     twitchId: String
+  }
+
+  extend type Query {
+    users: [User]
+    user(id: ID!): User
   }
 
   extend type Mutation {

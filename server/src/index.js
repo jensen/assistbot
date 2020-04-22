@@ -1,5 +1,6 @@
 const path = require("path");
 const dotenv = require("dotenv");
+const http = require("http");
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
@@ -11,6 +12,17 @@ const { ApolloServer } = require("apollo-server-express");
 const snakeCase = require("lodash/snakeCase");
 
 const app = express();
+
+const userRoutes = require("./routes/users");
+const requestRoutes = require("./routes/requests");
+const messageRoutes = require("./routes/messages");
+
+const PORT = process.env.PORT;
+
+app.use(cors());
+app.use(express.static("public"));
+app.use(bodyparser.json());
+
 const apollo = new ApolloServer({
   schema: require("./graphql/schema"),
   fieldResolver: (source, args, contextValue, info) => {
@@ -23,20 +35,13 @@ const apollo = new ApolloServer({
   },
 });
 
-const userRoutes = require("./routes/users");
-const requestRoutes = require("./routes/requests");
-const messageRoutes = require("./routes/messages");
-
-const PORT = process.env.PORT;
-
-app.use(cors());
-app.use(express.static("public"));
-app.use(bodyparser.json());
-
-apollo.applyMiddleware({ app });
-
 app.use("/users", userRoutes);
 app.use("/requests", requestRoutes);
 app.use("/messages", messageRoutes);
 
-app.listen(PORT, "0.0.0.0", () => console.log(`Listening on port ${PORT}`));
+const server = http.createServer(app);
+
+apollo.applyMiddleware({ app });
+apollo.installSubscriptionHandlers(server);
+
+server.listen(PORT, "0.0.0.0", () => console.log(`Listening on port ${PORT}`));

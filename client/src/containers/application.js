@@ -2,7 +2,7 @@ import React from "react";
 import axios from "axios";
 import styled from "styled-components";
 import SideBar from "components/sidebar";
-import Router from "components/router";
+import Router from "pages";
 
 if (process.env.NODE_ENV === "development" && process.env.REACT_APP_API_URL) {
   axios.defaults.baseURL = process.env.REACT_APP_API_URL;

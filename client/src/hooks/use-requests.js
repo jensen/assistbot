@@ -19,19 +19,19 @@ function checkDate(a, b) {
 }
 
 function getStatus(request) {
-  if (request.accepted_at === undefined || request.completed_at === undefined) {
+  if (request.acceptedAt === undefined || request.completedAt === undefined) {
     throw new Error("Request must have accepted_at and created_at properties");
   }
 
-  if (request.accepted_at && request.completed_at === null) {
+  if (request.acceptedAt && request.completedAt === null) {
     return 0;
   }
 
-  if (request.accepted_at === null && request.completed_at === null) {
+  if (request.acceptedAt === null && request.completedAt === null) {
     return 1;
   }
 
-  if (request.accepted_at && request.completed_at) {
+  if (request.acceptedAt && request.completedAt) {
     return 2;
   }
 }
@@ -45,12 +45,12 @@ export const sortRequests = (list) => {
       return 1;
     }
 
-    if (a.completed_at && b.completed_at) {
+    if (a.completedAt && b.completedAt) {
       /* if completed, newest on top */
-      return checkDate(b.completed_at, a.completed_at);
+      return checkDate(b.completedAt, a.completedAt);
     }
 
-    return checkDate(a.created_at, b.created_at);
+    return checkDate(a.createdAt, b.createdAt);
   });
 };
 
@@ -67,8 +67,8 @@ function reducer(state, action) {
     const { request } = action;
 
     return produce(state, (draftState) => {
-      draftState[request.id].accepted_at = request.accepted_at;
-      draftState[request.id].completed_at = request.completed_at;
+      draftState[request.id].acceptedAt = request.acceptedAt;
+      draftState[request.id].completedAt = request.completedAt;
     });
   }
 

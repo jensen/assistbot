@@ -42,6 +42,12 @@ const SideBar = () => (
           <MenuIcon.Queue />
         </MenuItem>
       </Link>
+      <Separator />
+      <Link to="/current">
+        <MenuItem>
+          <MenuIcon.Current />
+        </MenuItem>
+      </Link>
     </Menu>
   </SideBarContainer>
 );

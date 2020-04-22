@@ -1,11 +1,44 @@
 import React from "react";
 import styled from "styled-components";
+import { preloadQuery, usePreloadedQuery } from "react-relay/hooks";
+import { useSubscription } from "relay-hooks";
+import graphql from "babel-plugin-relay/macro";
+import RelayEnvironment from "relay/environment";
+import { sortRequests } from "hooks/use-requests";
 import Request from "components/request";
-import useRequests, { sortRequests } from "hooks/use-requests";
-import useLiveApi from "hooks/use-live-api";
-import { useSlowTicker } from "hooks/use-ticker";
 import { getIsExpired } from "utils/date";
-import { makeList } from "utils/serialization";
+
+const QueueQuery = graphql`
+  query queueQuery {
+    requests {
+      id
+      description
+      createdAt
+      acceptedAt
+      completedAt
+      user {
+        username
+        avatar
+      }
+    }
+  }
+`;
+
+const QueueSubscription = graphql`
+  subscription queueSubscription {
+    requestAdded {
+      id
+      description
+      createdAt
+      acceptedAt
+      completedAt
+      user {
+        username
+        avatar
+      }
+    }
+  }
+`;
 
 const RequestListContainer = styled.ul`
   position: absolute;
@@ -20,30 +53,35 @@ const RequestListContainer = styled.ul`
 `;
 
 const Queue = () => {
-  const {
-    state,
-    initializeRequests,
-    addRequests,
-    updateStatus,
-  } = useRequests();
+  const preloadedQuery = React.useMemo(
+    () => preloadQuery(RelayEnvironment, QueueQuery, {}),
+    []
+  );
+  const data = usePreloadedQuery(QueueQuery, preloadedQuery);
 
-  useLiveApi("/requests", initializeRequests, addRequests);
-
-  /* update the component every couple of seconds so that
-     relative times are accurate */
-  useSlowTicker();
+  useSubscription(
+    React.useMemo(
+      () => ({
+        variables: {},
+        subscription: QueueSubscription,
+      }),
+      []
+    )
+  );
 
   return (
     <RequestListContainer>
       {sortRequests(
-        makeList(state).filter(
-          (request) => getIsExpired(request.completed_at) === false
+        data.requests.filter(
+          (request) => getIsExpired(request.completedAt) === false
         )
       ).map((request) => (
         <Request
-          key={`${request.id}-${request.created_at}`}
+          key={`${request.id}-${request.createdAt}`}
           {...request}
-          updateStatus={() => updateStatus(request)}
+          username={request.user.username}
+          avatar={request.user.avatar}
+          updateStatus={() => null}
         />
       ))}
     </RequestListContainer>

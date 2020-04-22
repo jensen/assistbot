@@ -1,4 +1,3 @@
-const { db } = require("../../db");
 const { makeExecutableSchema } = require("apollo-server-express");
 const merge = require("lodash/merge");
 
@@ -12,6 +11,14 @@ const {
   resolvers: MessageResolvers,
 } = require("./message");
 
+const Schema = `
+  schema {
+    query: Query
+    mutation: Mutation
+    subscription: Subscription
+  }
+`;
+
 const QueryType = `
   type Query {
     _empty: String
@@ -24,12 +31,24 @@ const MutationType = `
   }
 `;
 
-const BaseResolvers = {
-  Query: {},
-};
+const SubscriptionType = `
+  type Subscription {
+    _empty: String
+  }
+`;
+
+const BaseResolvers = {};
 
 module.exports = makeExecutableSchema({
-  typeDefs: [QueryType, MutationType, UserTypes, RequestTypes, MessageTypes],
+  typeDefs: [
+    Schema,
+    QueryType,
+    MutationType,
+    SubscriptionType,
+    UserTypes,
+    RequestTypes,
+    MessageTypes,
+  ],
   resolvers: merge(
     BaseResolvers,
     UserResolvers,

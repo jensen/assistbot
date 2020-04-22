@@ -1,15 +1,11 @@
 const {
   db,
-  helpers: { allRows, firstRow },
+  helpers: { allRows, firstRow, toCamelCase },
 } = require("../../db");
 const { addRequest } = require("../../db/helpers/request");
+const { PubSub } = require("apollo-server-express");
 
 const types = `
-  extend type Query {
-    requests(from: Int): [Request]
-    request(id: ID, filter: String): Request
-  }
-
   type Request {
     id: ID!
     description: String
@@ -23,16 +19,28 @@ const types = `
     messages: [Message]
   }
 
+  extend type Query {
+    requests(from: Int): [Request]
+    request(id: ID, filter: String): Request
+  }
+
   extend type Mutation {
     addRequest(userId: ID!, type: String, description: String, link: String): Request
     acceptRequest(id: ID!): Request
     completeRequest(id: ID!): Request
   }
+
+  extend type Subscription {
+    requestAdded: Request
+  }
 `;
+
+const pubsub = new PubSub();
+const REQUEST_ADDED = "REQUEST_ADDED";
 
 const resolvers = {
   Query: {
-    requests: (parent, args, context, info) => {
+    requests: (parent, args, context) => {
       if (args.from) {
         return db
           .query(
@@ -44,7 +52,7 @@ const resolvers = {
 
       return db.query("SELECT * FROM requests").then(allRows);
     },
-    request: (parent, args, context, info) => {
+    request: (parent, args, context) => {
       if (args.filter) {
         if (args.filter === "accepted") {
           return db
@@ -65,12 +73,11 @@ const resolvers = {
     },
   },
   Request: {
-    user: (parent, args, context, info) =>
+    user: (parent, args, context) =>
       db
         .query("SELECT * FROM users WHERE users.id = $1", [parent.users_id])
         .then(firstRow),
-
-    messages: (parent, args, context, info) =>
+    messages: (parent, args, context) =>
       db
         .query(
           `
@@ -89,9 +96,17 @@ const resolvers = {
         )
         .then(allRows),
   },
+  Subscription: {
+    requestAdded: {
+      subscribe: () => pubsub.asyncIterator([REQUEST_ADDED]),
+    },
+  },
   Mutation: {
-    addRequest: (parent, { userId, type, description, link }, context, info) =>
-      addRequest(userId, type, description, link),
+    addRequest: (parent, { userId, type, description, link }, context) =>
+      addRequest(userId, type, description, link).then((request) => {
+        pubsub.publish(REQUEST_ADDED, { requestAdded: toCamelCase(request) });
+        return request;
+      }),
     acceptRequest: (parent, { id }, context, info) =>
       db
         .query(

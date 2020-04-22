@@ -5,17 +5,17 @@ const {
 const { addMessage } = require("../../db/helpers/message");
 
 const types = `
-  extend type Query {
-    messages(from: Int): [Message]
-    message(id: ID!): Message
-  }
-
   type Message {
     id: ID!
     message: String
     emotes: String
     createdAt: String
     user: User
+  }
+
+  extend type Query {
+    messages(from: Int): [Message]
+    message(id: ID!): Message
   }
 
   extend type Mutation {

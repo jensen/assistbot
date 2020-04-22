@@ -82,7 +82,7 @@ export const Menu = {
       />
     </svg>
   ),
-  InProgress: () => (
+  Current: () => (
     <svg
       width="24"
       height="19"

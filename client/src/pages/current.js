@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import React from "react";
 import { preloadQuery, usePreloadedQuery } from "react-relay/hooks";
 import graphql from "babel-plugin-relay/macro";
 import RelayEnvironment from "relay/environment";
@@ -25,10 +25,12 @@ const RequestQuery = graphql`
   }
 `;
 
-const preloadedQuery = preloadQuery(RelayEnvironment, RequestQuery, {});
-
 const Current = (props) => {
-  const data = usePreloadedQuery(RequestQuery, props.preloadedQuery);
+  const preloadedQuery = React.useMemo(
+    () => preloadQuery(RelayEnvironment, RequestQuery, {}),
+    []
+  );
+  const data = usePreloadedQuery(RequestQuery, preloadedQuery);
   if (!data.request) return <div>No accepted requests.</div>;
 
   return (
@@ -47,12 +49,4 @@ const Current = (props) => {
   );
 };
 
-const CurrentContainer = () => {
-  return (
-    <Suspense fallback="Loading...">
-      <Current preloadedQuery={preloadedQuery} />
-    </Suspense>
-  );
-};
-
-export default CurrentContainer;
+export default Current;

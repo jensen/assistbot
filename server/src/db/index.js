@@ -1,4 +1,5 @@
 const pg = require("pg");
+const camelCase = require("lodash/camelCase");
 const client = new pg.Client();
 
 /*
@@ -12,6 +13,11 @@ pg.types.setTypeParser(1114, (stringValue) => stringValue);
 const helpers = {
   allRows: ({ rows }) => rows,
   firstRow: ({ rows }) => (rows && rows.length > 0 && rows[0]) || null,
+  toCamelCase: (object) => {
+    return Object.keys(object).reduce((converted, current) => {
+      return { ...converted, [camelCase(current)]: object[current] };
+    }, {});
+  },
 };
 
 (async function () {
