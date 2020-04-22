@@ -1,4 +1,4 @@
-type Message {
+type Message implements Node {
   id: ID!
   message: String
   emotes: String
@@ -15,8 +15,12 @@ type Mutation {
   addMessage(userId: ID!, message: String, emotes: String): Message
 }
 
+interface Node {
+  id: ID!
+}
+
 type Query {
-  _empty: String
+  node(id: ID!): Node
   users: [User]
   user(id: ID!): User
   requests(from: Int): [Request]
@@ -25,7 +29,7 @@ type Query {
   message(id: ID!): Message
 }
 
-type Request {
+type Request implements Node {
   id: ID!
   description: String
   type: String
@@ -43,7 +47,7 @@ type Subscription {
   requestAdded: Request
 }
 
-type User {
+type User implements Node {
   id: ID!
   username: String
   avatar: String

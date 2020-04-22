@@ -5,7 +5,7 @@ const {
 const { addMessage } = require("../../db/helpers/message");
 
 const types = `
-  type Message {
+  type Message implements Node {
     id: ID!
     message: String
     emotes: String

@@ -17,5 +17,6 @@
     "url": "https://github.com/jensen/twitchbot/issues"
   },
   "homepage": "https://github.com/jensen/twitchbot#readme",
-  "devDependencies": {}
+  "devDependencies": {},
+  "dependencies": {}
 }

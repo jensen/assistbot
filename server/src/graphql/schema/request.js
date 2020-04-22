@@ -6,7 +6,7 @@ const { addRequest } = require("../../db/helpers/request");
 const { PubSub } = require("apollo-server-express");
 
 const types = `
-  type Request {
+  type Request implements Node {
     id: ID!
     description: String
     type: String

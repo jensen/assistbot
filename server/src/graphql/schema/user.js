@@ -5,7 +5,7 @@ const {
 const { addUser } = require("../../db/helpers/request");
 
 const types = `
-  type User {
+  type User implements Node {
     id: ID!
     username: String
     avatar: String
