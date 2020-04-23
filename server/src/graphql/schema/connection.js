@@ -1,5 +1,5 @@
 const { db } = require("../../db");
-
+const { ApolloError } = require("apollo-server-express");
 const { base64, unbase64 } = require("./encoding");
 
 const PREFIX = "arrayconnector";
@@ -24,7 +24,7 @@ const connectionTo = (table, id, args) => {
 
       /* no reason to have these out of logical order */
       if (beforeId < afterId) {
-        throw new Error(
+        throw new ApolloError(
           "Record for the before offset must be newer than the record for the after offset"
         );
       }
@@ -52,7 +52,7 @@ const connectionTo = (table, id, args) => {
   query += ` ORDER BY ${table}.id`;
 
   if (first && last) {
-    throw new Error("Should use either first or last, but not both");
+    throw new ApolloError("Should use either first or last, but not both");
   }
 
   /* first and last allows us to resize the window */
