@@ -1,5 +1,6 @@
 const { makeExecutableSchema } = require("apollo-server-express");
 const merge = require("lodash/merge");
+const { encodeGlobalId, decodeGlobalId } = require("./encoding");
 
 const {
   db,
@@ -16,30 +17,22 @@ const {
   resolvers: MessageResolvers,
 } = require("./message");
 
-const encode = (obj, type) =>
-  Buffer.from(`${obj.id}:${type}`, `utf8`).toString(`base64`);
-const decode = (input) => {
-  const [id, __typename] = Buffer.from(input, "base64")
-    .toString("utf8")
-    .split(":");
-
-  return {
-    id,
-    __typename,
-  };
-};
-
 const Schema = `
   schema {
     query: Query
     mutation: Mutation
     subscription: Subscription
   }
-`;
 
-const Node = `
   interface Node {
     id: ID!
+  }
+
+  type PageInfo {
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+    startCursor: String
+    endCursor: String
   }
 `;
 
@@ -67,7 +60,7 @@ const BaseResolvers = {
   },
   Query: {
     node: (parent, args, context) => {
-      const { id, __typename } = decode(args.id);
+      const { id, __typename } = decodeGlobalId(args.id);
 
       return db
         .query(`SELECT * FROM ${__typename.toLowerCase()}s WHERE id = $1`, [id])
@@ -78,23 +71,22 @@ const BaseResolvers = {
 };
 
 const GlobalIDResolvers = {
-  User: UserResolvers,
   Request: RequestResolvers,
   Message: MessageResolvers,
+  User: UserResolvers,
 };
 
 const applyGlobalID = (name, resolver) => ({
   ...resolver,
   [name]: {
     ...resolver[name],
-    id: (obj) => encode(obj, name),
+    id: (obj) => encodeGlobalId(obj, name),
   },
 });
 
 module.exports = makeExecutableSchema({
   typeDefs: [
     Schema,
-    Node,
     QueryType,
     MutationType,
     SubscriptionType,
