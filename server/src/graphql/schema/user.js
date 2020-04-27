@@ -14,26 +14,6 @@ const types = `
     requests(first: Int, after: String, last: Int, before: String): RequestConnection
     messages(first: Int, after: String, last: Int, before: String): MessageConnection
   }
-  
-  type RequestEdge {
-    cursor: String!
-    node: Request
-  }
-
-  type RequestConnection {
-    edges: [RequestEdge]
-    pageInfo: PageInfo
-  }
-  
-  type MessageEdge {
-    cursor: String!
-    node: Message
-  }
-
-  type MessageConnection {
-    edges: [MessageEdge]
-    pageInfo: PageInfo
-  }
 
   extend type Query {
     users: [User]
@@ -55,8 +35,20 @@ const resolvers = {
         .then(firstRow),
   },
   User: {
-    requests: (parent, args) => connectionTo("requests", parent.id, args),
-    messages: (parent, args) => connectionTo("messages", parent.id, args),
+    requests: (parent, args) =>
+      connectionTo(
+        "requests",
+        "SELECT * FROM requests WHERE requests.users_id = $1",
+        [parent.id],
+        args
+      ),
+    messages: (parent, args) =>
+      connectionTo(
+        "messages",
+        "SELECT * FROM messages WHERE messages.users_id = $1",
+        [parent.id],
+        args
+      ),
   },
   Mutation: {
     addUser: (parent, { twitchId }, context, info) => addUser(twitchId),

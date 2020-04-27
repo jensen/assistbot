@@ -1,4 +1,7 @@
 import React, { useMemo } from "react";
+import { useFragment } from "react-relay/hooks";
+import { useMutation } from "react-relay/lib/relay-experimental";
+import graphql from "babel-plugin-relay/macro";
 import styled from "styled-components";
 import { v4 as uuidv4 } from "uuid";
 import Avatar from "components/avatar";
@@ -7,11 +10,11 @@ import { TypeIcon } from "components/icons";
 import { separateUrls } from "utils/url";
 import { fadeIntoTime } from "utils/date";
 
-const statusLookup = {
-  created: "#A03333",
-  inprogress: "#B79312",
-  completed: "#42A033",
-};
+const statusColorMap = new Map([
+  ["created", "#A03333"],
+  ["accepted", "#B79312"],
+  ['completed: "#42A033"'],
+]);
 
 const RequestContainer = styled.li`
   width: 100%;
@@ -22,7 +25,8 @@ const RequestContainer = styled.li`
 
 const Header = styled.header`
   padding: 0.5rem 1rem;
-  background-color: ${({ status }) => statusLookup[status] || "transparent"};
+  background-color: ${({ status }) =>
+    statusColorMap.get(status) || "transparent"};
   height: 32px;
   border-top-left-radius: 0.5rem;
   border-top-right-radius: 0.5rem;
@@ -81,6 +85,37 @@ const DescriptionLink = styled.a`
   }
 `;
 
+const RequestFragment = graphql`
+  fragment requestRequest on Request {
+    id
+    description
+    type
+    createdAt
+    acceptedAt
+    completedAt
+    user {
+      username
+      avatar
+    }
+  }
+`;
+
+const AcceptRequestMutation = graphql`
+  mutation requestAcceptMutation($id: ID!) {
+    acceptRequest(id: $id) {
+      acceptedAt
+    }
+  }
+`;
+
+const CompleteRequestMutation = graphql`
+  mutation requestCompleteMutation($id: ID!) {
+    completeRequest(id: $id) {
+      completedAt
+    }
+  }
+`;
+
 const getDescription = (description) =>
   separateUrls(description).map((part) =>
     part.type === "link" ? (
@@ -92,26 +127,39 @@ const getDescription = (description) =>
     )
   );
 
-const Request = ({
-  type,
-  username,
-  description,
-  createdAt,
-  acceptedAt,
-  completedAt,
-  avatar,
-  updateStatus,
-}) => {
+const Request = (props) => {
+  const {
+    id,
+    description,
+    type,
+    createdAt,
+    acceptedAt,
+    completedAt,
+    user: { username, avatar },
+  } = useFragment(RequestFragment, props.request);
+  const [acceptRequest] = useMutation(AcceptRequestMutation);
+  const [completeRequest] = useMutation(CompleteRequestMutation);
+
   const status = completedAt
     ? "completed"
     : acceptedAt
-    ? "inprogress"
+    ? "accepted"
     : "created";
 
   const separatedDescription = useMemo(
     () => getDescription(description || ""),
     [description]
   );
+
+  const updateStatus = () => {
+    if (status === "created") {
+      acceptRequest({ variables: { id } });
+    }
+
+    if (status === "accepted") {
+      completeRequest({ variables: { id } });
+    }
+  };
 
   return (
     <RequestContainer opacity={fadeIntoTime(completedAt)}>

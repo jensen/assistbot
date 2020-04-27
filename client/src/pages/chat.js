@@ -1,9 +1,10 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useEffect, Suspense } from "react";
 import styled from "styled-components";
-import Message from "components/message";
-import useMessages, { groupMessagesByUser } from "hooks/use-messages";
-import useLiveApi from "hooks/use-live-api";
-import { makeList } from "utils/serialization";
+import graphql from "babel-plugin-relay/macro";
+import { usePreloadedQuery } from "react-relay/hooks";
+import { useSubscription } from "relay-hooks";
+import { ConnectionHandler } from "relay-runtime";
+import MessageGroup from "components/group";
 
 const MessageList = styled.ul`
   position: absolute;
@@ -17,35 +18,85 @@ const MessageList = styled.ul`
   scrollbar-width: none;
 `;
 
-const ChatPage = () => {
-  const { state, initializeMessages, addMessages } = useMessages();
-  const { loading } = useLiveApi("/messages", initializeMessages, addMessages);
+const MessagePlaceholder = styled.li`
+  height: 200px;
+`;
 
-  const [firstScroll, setFirstScroll] = useState(true);
+const ChatQuery = graphql`
+  query chatQuery {
+    chat {
+      groups(last: 250) @connection(key: "chatQuery_groups") {
+        edges {
+          node {
+            id
+            ...groupGroup
+          }
+        }
+      }
+    }
+  }
+`;
+
+const ChatSubscription = graphql`
+  subscription chatSubscription {
+    addMessage {
+      cursor
+      node {
+        ...messageMessage
+      }
+    }
+  }
+`;
+
+const ChatPage = (props) => {
+  const {
+    chat: { groups },
+  } = usePreloadedQuery(ChatQuery, props.preloadedQuery);
+
+  useSubscription(
+    React.useMemo(
+      () => ({
+        subscription: ChatSubscription,
+        updater: (store) => {
+          // const root = store.getRoot().getLinkedRecord("chat");
+          // const message = store.getRootField("addMessage");
+          // const messages = ConnectionHandler.getConnection(
+          //   root,
+          //   "chatQuery_messages"
+          // );
+          // ConnectionHandler.insertEdgeAfter(
+          //   messages,
+          //   ConnectionHandler.buildConnectionEdge(store, messages, message)
+          // );
+        },
+      }),
+      []
+    )
+  );
 
   const scrollRef = useRef(null);
+  const initialScrollRef = useRef(true);
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({
-        behavior: firstScroll ? "auto" : "smooth",
+        behavior: initialScrollRef.current ? "auto" : "smooth",
       });
+      initialScrollRef.current = false;
     }
-  }, [state, firstScroll]);
-
-  useEffect(() => {
-    if (!loading) {
-      setFirstScroll(false);
-    }
-  }, [loading]);
+  }, [groups.edges]);
 
   return (
     <MessageList>
-      {groupMessagesByUser(makeList(state))
-        .sort((a, b) => new Date(a.date) - new Date(b.date))
-        .map((message, index) => (
-          <Message key={message.id} alternate={index % 2 === 0} {...message} />
-        ))}
+      {groups.edges.map(({ node: group }, index) => (
+        <Suspense fallback={<MessagePlaceholder>Loading</MessagePlaceholder>}>
+          <MessageGroup
+            key={group.id}
+            alternate={index % 2 === 0}
+            group={group}
+          />
+        </Suspense>
+      ))}
       <div ref={scrollRef}></div>
     </MessageList>
   );

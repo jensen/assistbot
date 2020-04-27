@@ -29,7 +29,8 @@
     "build": "npm run relay && react-scripts build",
     "test": "react-scripts test",
     "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",
-    "relay": "./node_modules/.bin/relay-compiler --schema ./src/relay/schema.graphql --src ./src/ --watchman false $@"
+    "relay": "./node_modules/.bin/relay-compiler --schema ./src/relay/schema.graphql --src ./src/ --watchman false $@",
+    "relay:watch": "./node_modules/.bin/relay-compiler --schema ./src/relay/schema.graphql --src ./src/ --watch $@"
   },
   "eslintConfig": {
     "extends": "react-app"

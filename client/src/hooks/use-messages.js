@@ -18,7 +18,7 @@ export const groupMessagesByUser = (list) =>
     if (groups.length > 0) {
       const last = groups[groups.length - 1];
 
-      if (last.username === message.username) {
+      if (last.user.username === message.user.username) {
         return [
           ...groups.slice(0, groups.length - 1),
           { ...last, messages: [...last.messages, message] },

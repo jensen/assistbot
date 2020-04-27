@@ -8,12 +8,8 @@ const offsetToCursor = (offset) => base64(PREFIX + offset);
 const cursorToOffset = (cursor) =>
   parseInt(unbase64(cursor).substring(PREFIX.length), 10);
 
-const connectionTo = (table, id, args) => {
+const connectionTo = (table, query, params = [], args) => {
   const { first, last, after, before } = args;
-
-  /* start with an initial query of rows */
-  let query = `SELECT * FROM ${table} WHERE ${table}.users_id = $1`;
-  let params = [id];
 
   /* create a window on the data */
   if (before || after) {
@@ -127,6 +123,7 @@ const connectionTo = (table, id, args) => {
 
       https://relay.dev/graphql/connections.htm
     */
+
     return {
       page_info: {
         start_cursor:
@@ -147,5 +144,7 @@ const connectionTo = (table, id, args) => {
 };
 
 module.exports = {
+  offsetToCursor,
+  cursorToOffset,
   connectionTo,
 };

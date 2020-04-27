@@ -1,4 +1,4 @@
-const { makeExecutableSchema } = require("apollo-server-express");
+const { PubSub, makeExecutableSchema } = require("apollo-server-express");
 const merge = require("lodash/merge");
 const { encodeGlobalId, decodeGlobalId } = require("./encoding");
 
@@ -8,6 +8,8 @@ const {
 } = require("../../db/");
 
 const { types: UserTypes, resolvers: UserResolvers } = require("./user");
+const { types: QueueTypes, resolvers: QueueResolvers } = require("./queue");
+const { types: ChatTypes, resolvers: ChatResolvers } = require("./chat");
 const {
   types: RequestTypes,
   resolvers: RequestResolvers,
@@ -33,6 +35,36 @@ const Schema = `
     hasPreviousPage: Boolean!
     startCursor: String
     endCursor: String
+  }
+
+  type RequestEdge {
+    cursor: String!
+    node: Request
+  }
+
+  type RequestConnection {
+    edges: [RequestEdge]
+    pageInfo: PageInfo
+  }
+  
+  type MessageEdge {
+    cursor: String!
+    node: Message
+  }
+
+  type MessageConnection {
+    edges: [MessageEdge]
+    pageInfo: PageInfo
+  }
+
+  type MessageGroupEdge {
+    cursor: String!
+    node: MessageGroup
+  }
+
+  type MessageGroupConnection {
+    edges: [MessageGroupEdge]
+    pageInfo: PageInfo
   }
 `;
 
@@ -60,6 +92,10 @@ const BaseResolvers = {
   },
   Query: {
     node: (parent, args, context) => {
+      if (args.id === "queue:Queue") {
+        return { id: "queue", __typename: "Queue" };
+      }
+
       const { id, __typename } = decodeGlobalId(args.id);
 
       return db
@@ -70,9 +106,12 @@ const BaseResolvers = {
   },
 };
 
+const pubsub = new PubSub();
+
 const GlobalIDResolvers = {
-  Request: RequestResolvers,
-  Message: MessageResolvers,
+  Request: RequestResolvers(pubsub),
+  Message: MessageResolvers(pubsub),
+  MessageGroup: MessageResolvers(pubsub),
   User: UserResolvers,
 };
 
@@ -91,11 +130,15 @@ module.exports = makeExecutableSchema({
     MutationType,
     SubscriptionType,
     UserTypes,
+    QueueTypes,
+    ChatTypes,
     RequestTypes,
     MessageTypes,
   ],
   resolvers: merge(
     BaseResolvers,
+    QueueResolvers,
+    ChatResolvers,
     ...Object.entries(GlobalIDResolvers).map(([name, resolver]) =>
       applyGlobalID(name, resolver)
     )

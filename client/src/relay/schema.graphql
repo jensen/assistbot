@@ -1,3 +1,8 @@
+type Chat {
+  groups(first: Int, after: String, last: Int, before: String): MessageGroupConnection
+  messages(first: Int, after: String, last: Int, before: String): MessageConnection
+}
+
 type Message implements Node {
   id: ID!
   message: String
@@ -6,27 +11,67 @@ type Message implements Node {
   user: User
 }
 
+type MessageConnection {
+  edges: [MessageEdge]
+  pageInfo: PageInfo
+}
+
+type MessageEdge {
+  cursor: String!
+  node: Message
+}
+
+type MessageGroup implements Node {
+  id: ID!
+  user: User
+  messages: [Message]
+}
+
+type MessageGroupConnection {
+  edges: [MessageGroupEdge]
+  pageInfo: PageInfo
+}
+
+type MessageGroupEdge {
+  cursor: String!
+  node: MessageGroup
+}
+
 type Mutation {
   _empty: String
   addUser(twitchId: String!): User
-  addRequest(userId: ID!, type: String, description: String, link: String): Request
+  addRequest(userId: ID!, type: String, description: String, link: String): RequestEdge
   acceptRequest(id: ID!): Request
   completeRequest(id: ID!): Request
-  addMessage(userId: ID!, message: String, emotes: String): Message
+  addMessage(userId: ID!, message: String, emotes: String): MessageEdge
 }
 
 interface Node {
   id: ID!
 }
 
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
 type Query {
   node(id: ID!): Node
   users: [User]
   user(id: ID!): User
+  queue: Queue
+  chat: Chat
   requests(from: Int): [Request]
   request(id: ID, filter: String): Request
   messages(from: Int): [Message]
   message(id: ID!): Message
+}
+
+type Queue implements Node {
+  id: ID!
+  requests(first: Int, after: String, last: Int, before: String, status: String): RequestConnection
 }
 
 type Request implements Node {
@@ -42,9 +87,20 @@ type Request implements Node {
   messages: [Message]
 }
 
+type RequestConnection {
+  edges: [RequestEdge]
+  pageInfo: PageInfo
+}
+
+type RequestEdge {
+  cursor: String!
+  node: Request
+}
+
 type Subscription {
   _empty: String
-  requestAdded: Request
+  addRequest: RequestEdge
+  addMessage: MessageEdge
 }
 
 type User implements Node {
@@ -52,5 +108,7 @@ type User implements Node {
   username: String
   avatar: String
   twitchId: String
+  requests(first: Int, after: String, last: Int, before: String): RequestConnection
+  messages(first: Int, after: String, last: Int, before: String): MessageConnection
 }
 

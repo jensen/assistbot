@@ -20,7 +20,7 @@ function checkDate(a, b) {
 
 function getStatus(request) {
   if (request.acceptedAt === undefined || request.completedAt === undefined) {
-    throw new Error("Request must have accepted_at and created_at properties");
+    throw new Error("Request must have acceptedAt and completedAt properties");
   }
 
   if (request.acceptedAt && request.completedAt === null) {
@@ -37,7 +37,15 @@ function getStatus(request) {
 }
 
 export const sortRequests = (list) => {
-  return list.sort((a, b) => {
+  return Array.from(list).sort((a, b) => {
+    if (a.node) {
+      a = a.node;
+    }
+
+    if (b.node) {
+      b = b.node;
+    }
+
     if (getStatus(a) < getStatus(b)) {
       return -1;
     }
@@ -48,6 +56,9 @@ export const sortRequests = (list) => {
     if (a.completedAt && b.completedAt) {
       /* if completed, newest on top */
       return checkDate(b.completedAt, a.completedAt);
+    }
+    if (a.createdAt === undefined || b.createdAt === undefined) {
+      throw new Error("Request must have a createdAt property");
     }
 
     return checkDate(a.createdAt, b.createdAt);

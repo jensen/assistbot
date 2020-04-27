@@ -43,7 +43,7 @@ const SideBar = () => (
         </MenuItem>
       </Link>
       <Separator />
-      <Link to="/current">
+      <Link to="/queue/current">
         <MenuItem>
           <MenuIcon.Current />
         </MenuItem>
