@@ -4,7 +4,7 @@ import graphql from "babel-plugin-relay/macro";
 import { usePreloadedQuery } from "react-relay/hooks";
 import { useSubscription } from "relay-hooks";
 import { ConnectionHandler } from "relay-runtime";
-import MessageGroup from "components/group";
+import MessageGroup, { MessageGroupLoading } from "components/group";
 
 const MessageList = styled.ul`
   position: absolute;
@@ -18,18 +18,20 @@ const MessageList = styled.ul`
   scrollbar-width: none;
 `;
 
-const MessagePlaceholder = styled.li`
-  height: 200px;
-`;
-
 const ChatQuery = graphql`
-  query chatQuery {
+  query chatQuery($last: Int) {
     chat {
-      groups(last: 250) @connection(key: "chatQuery_groups") {
+      messages(last: $last) @connection(key: "chatQuery_messages") {
         edges {
           node {
             id
-            ...groupGroup
+            user {
+              username
+              avatar
+            }
+            message
+            emotes
+            ...messageMessage
           }
         }
       }
@@ -42,15 +44,48 @@ const ChatSubscription = graphql`
     addMessage {
       cursor
       node {
+        user {
+          username
+          avatar
+        }
         ...messageMessage
       }
     }
   }
 `;
 
+const groupMessagesByUser = (list) => {
+  const [first] = list;
+  const groups = [
+    {
+      username: first.user.username,
+      avatar: first.user.avatar,
+      messages: [{ ...first }],
+    },
+  ];
+
+  for (let i = 1, groupIndex = 0; i < list.length; i++) {
+    if (list[i].user.username !== list[i - 1].user.username) {
+      groupIndex += 1;
+    }
+
+    if (!groups[groupIndex]) {
+      groups[groupIndex] = {
+        username: list[i].user.username,
+        avatar: list[i].user.avatar,
+        messages: [],
+      };
+    }
+
+    groups[groupIndex].messages.push({ ...list[i] });
+  }
+
+  return groups;
+};
+
 const ChatPage = (props) => {
   const {
-    chat: { groups },
+    chat: { messages },
   } = usePreloadedQuery(ChatQuery, props.preloadedQuery);
 
   useSubscription(
@@ -58,16 +93,18 @@ const ChatPage = (props) => {
       () => ({
         subscription: ChatSubscription,
         updater: (store) => {
-          // const root = store.getRoot().getLinkedRecord("chat");
-          // const message = store.getRootField("addMessage");
-          // const messages = ConnectionHandler.getConnection(
-          //   root,
-          //   "chatQuery_messages"
-          // );
-          // ConnectionHandler.insertEdgeAfter(
-          //   messages,
-          //   ConnectionHandler.buildConnectionEdge(store, messages, message)
-          // );
+          const root = store.getRoot().getLinkedRecord("chat");
+          const message = store.getRootField("addMessage");
+
+          const messages = ConnectionHandler.getConnection(
+            root,
+            "chatQuery_messages"
+          );
+
+          ConnectionHandler.insertEdgeAfter(
+            messages,
+            ConnectionHandler.buildConnectionEdge(store, messages, message)
+          );
         },
       }),
       []
@@ -84,22 +121,37 @@ const ChatPage = (props) => {
       });
       initialScrollRef.current = false;
     }
-  }, [groups.edges]);
+  }, [messages]);
 
   return (
     <MessageList>
-      {groups.edges.map(({ node: group }, index) => (
-        <Suspense fallback={<MessagePlaceholder>Loading</MessagePlaceholder>}>
-          <MessageGroup
-            key={group.id}
-            alternate={index % 2 === 0}
-            group={group}
-          />
-        </Suspense>
-      ))}
+      {groupMessagesByUser(messages.edges.map((edge) => edge.node)).map(
+        (group, index) => (
+          <Suspense
+            fallback={<MessageGroupLoading alternate={index % 2 === 0} />}
+          >
+            <MessageGroup alternate={index % 2 === 0} {...group} />
+          </Suspense>
+        )
+      )}
       <div ref={scrollRef}></div>
     </MessageList>
   );
 };
 
 export default ChatPage;
+
+/*
+
+map(
+        ({ node: group }, index) => (
+          <Suspense fallback={<MessagePlaceholder>Loading</MessagePlaceholder>}>
+            <MessageGroup
+              key={group.id}
+              alternate={index % 2 === 0}
+              group={group}
+            />
+          </Suspense>
+        )
+      )
+*/

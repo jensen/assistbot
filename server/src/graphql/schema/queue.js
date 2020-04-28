@@ -8,15 +8,16 @@ const types = `
 
   extend type Query {
     queue: Queue
+    current: Queue
   }
 `;
 
 const resolvers = {
   Query: {
-    queue: () => ({}),
+    queue: () => ({ id: "queue:Queue" }),
+    current: () => ({ id: "current:Queue" }),
   },
   Queue: {
-    id: () => "queue:Queue",
     requests: (parent, args) => {
       if (args.status === "accepted") {
         return connectionTo(

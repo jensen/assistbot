@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash aabddf13d1ac06d4c29e27ceb1f2397c
+ * @relayHash 5912339cefba40287436dfc8abd35175
  */
 
 /* eslint-disable */
@@ -9,59 +9,49 @@
 
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
-type paginatedQueueFragment$ref = any;
-export type queueQueryVariables = {|
+type allQueueFragment$ref = any;
+export type queueAllQueryVariables = {|
   first?: ?number,
   after?: ?string,
+  last?: ?number,
+  before?: ?string,
   status?: ?string,
 |};
-export type queueQueryResponse = {|
+export type queueAllQueryResponse = {|
   +queue: ?{|
     +id: string,
-    +$fragmentRefs: paginatedQueueFragment$ref,
+    +$fragmentRefs: allQueueFragment$ref,
   |}
 |};
-export type queueQuery = {|
-  variables: queueQueryVariables,
-  response: queueQueryResponse,
+export type queueAllQuery = {|
+  variables: queueAllQueryVariables,
+  response: queueAllQueryResponse,
 |};
 */
 
 
 /*
-query queueQuery(
+query queueAllQuery(
   $first: Int
   $after: String
+  $last: Int
+  $before: String
   $status: String
 ) {
   queue {
     id
-    ...paginatedQueueFragment
+    ...allQueueFragment
   }
 }
 
-fragment messageMessage on Message {
-  message
-  emotes
-}
-
-fragment paginatedQueueFragment on Queue {
+fragment allQueueFragment on Queue {
   id
-  requests(first: $first, after: $after, status: $status) {
+  requests(first: $first, after: $after, last: $last, before: $before, status: $status) {
     edges {
       node {
         createdAt
         acceptedAt
         completedAt
-        user {
-          username
-          avatar
-          id
-        }
-        messages {
-          ...messageMessage
-          id
-        }
         ...requestRequest
         id
         __typename
@@ -71,6 +61,8 @@ fragment paginatedQueueFragment on Queue {
     pageInfo {
       endCursor
       hasNextPage
+      hasPreviousPage
+      startCursor
     }
   }
 }
@@ -106,6 +98,18 @@ var v0 = [
   },
   {
     "kind": "LocalArgument",
+    "name": "last",
+    "type": "Int",
+    "defaultValue": null
+  },
+  {
+    "kind": "LocalArgument",
+    "name": "before",
+    "type": "String",
+    "defaultValue": null
+  },
+  {
+    "kind": "LocalArgument",
     "name": "status",
     "type": "String",
     "defaultValue": null
@@ -126,8 +130,18 @@ v2 = [
   },
   {
     "kind": "Variable",
+    "name": "before",
+    "variableName": "before"
+  },
+  {
+    "kind": "Variable",
     "name": "first",
     "variableName": "first"
+  },
+  {
+    "kind": "Variable",
+    "name": "last",
+    "variableName": "last"
   },
   {
     "kind": "Variable",
@@ -139,7 +153,7 @@ return {
   "kind": "Request",
   "fragment": {
     "kind": "Fragment",
-    "name": "queueQuery",
+    "name": "queueAllQuery",
     "type": "Query",
     "metadata": null,
     "argumentDefinitions": (v0/*: any*/),
@@ -156,7 +170,7 @@ return {
           (v1/*: any*/),
           {
             "kind": "FragmentSpread",
-            "name": "paginatedQueueFragment",
+            "name": "allQueueFragment",
             "args": null
           }
         ]
@@ -165,7 +179,7 @@ return {
   },
   "operation": {
     "kind": "Operation",
-    "name": "queueQuery",
+    "name": "queueAllQuery",
     "argumentDefinitions": (v0/*: any*/),
     "selections": [
       {
@@ -226,6 +240,21 @@ return {
                         "args": null,
                         "storageKey": null
                       },
+                      (v1/*: any*/),
+                      {
+                        "kind": "ScalarField",
+                        "alias": null,
+                        "name": "description",
+                        "args": null,
+                        "storageKey": null
+                      },
+                      {
+                        "kind": "ScalarField",
+                        "alias": null,
+                        "name": "type",
+                        "args": null,
+                        "storageKey": null
+                      },
                       {
                         "kind": "LinkedField",
                         "alias": null,
@@ -251,47 +280,6 @@ return {
                           },
                           (v1/*: any*/)
                         ]
-                      },
-                      {
-                        "kind": "LinkedField",
-                        "alias": null,
-                        "name": "messages",
-                        "storageKey": null,
-                        "args": null,
-                        "concreteType": "Message",
-                        "plural": true,
-                        "selections": [
-                          {
-                            "kind": "ScalarField",
-                            "alias": null,
-                            "name": "message",
-                            "args": null,
-                            "storageKey": null
-                          },
-                          {
-                            "kind": "ScalarField",
-                            "alias": null,
-                            "name": "emotes",
-                            "args": null,
-                            "storageKey": null
-                          },
-                          (v1/*: any*/)
-                        ]
-                      },
-                      (v1/*: any*/),
-                      {
-                        "kind": "ScalarField",
-                        "alias": null,
-                        "name": "description",
-                        "args": null,
-                        "storageKey": null
-                      },
-                      {
-                        "kind": "ScalarField",
-                        "alias": null,
-                        "name": "type",
-                        "args": null,
-                        "storageKey": null
                       },
                       {
                         "kind": "ScalarField",
@@ -333,6 +321,20 @@ return {
                     "name": "hasNextPage",
                     "args": null,
                     "storageKey": null
+                  },
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "hasPreviousPage",
+                    "args": null,
+                    "storageKey": null
+                  },
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "startCursor",
+                    "args": null,
+                    "storageKey": null
                   }
                 ]
               }
@@ -344,7 +346,7 @@ return {
             "name": "requests",
             "args": (v2/*: any*/),
             "handle": "connection",
-            "key": "queueQuery_requests",
+            "key": "allQueueQuery_requests",
             "filters": [
               "status"
             ]
@@ -355,14 +357,14 @@ return {
   },
   "params": {
     "operationKind": "query",
-    "name": "queueQuery",
+    "name": "queueAllQuery",
     "id": null,
-    "text": "query queueQuery(\n  $first: Int\n  $after: String\n  $status: String\n) {\n  queue {\n    id\n    ...paginatedQueueFragment\n  }\n}\n\nfragment messageMessage on Message {\n  message\n  emotes\n}\n\nfragment paginatedQueueFragment on Queue {\n  id\n  requests(first: $first, after: $after, status: $status) {\n    edges {\n      node {\n        createdAt\n        acceptedAt\n        completedAt\n        user {\n          username\n          avatar\n          id\n        }\n        messages {\n          ...messageMessage\n          id\n        }\n        ...requestRequest\n        id\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n\nfragment requestRequest on Request {\n  id\n  description\n  type\n  createdAt\n  acceptedAt\n  completedAt\n  user {\n    username\n    avatar\n    id\n  }\n}\n",
+    "text": "query queueAllQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n  $status: String\n) {\n  queue {\n    id\n    ...allQueueFragment\n  }\n}\n\nfragment allQueueFragment on Queue {\n  id\n  requests(first: $first, after: $after, last: $last, before: $before, status: $status) {\n    edges {\n      node {\n        createdAt\n        acceptedAt\n        completedAt\n        ...requestRequest\n        id\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment requestRequest on Request {\n  id\n  description\n  type\n  createdAt\n  acceptedAt\n  completedAt\n  user {\n    username\n    avatar\n    id\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '67357fd415a446700da19b32a207093e';
+(node/*: any*/).hash = '6d3996553b7f9ab7b4056bc4797ffd14';
 
 module.exports = node;

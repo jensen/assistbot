@@ -1,10 +1,13 @@
-import React from "react";
-import graphql from "babel-plugin-relay/macro";
+import React, { useMemo, useEffect } from "react";
 import styled from "styled-components";
-import { usePreloadedQuery } from "react-relay/hooks";
+import { useRouteMatch } from "react-router-dom";
+import RelayEnvironment from "relay/environment";
+import { preloadQuery, usePreloadedQuery } from "react-relay/hooks";
+import graphql from "babel-plugin-relay/macro";
 import { useSubscription } from "relay-hooks";
 import { ConnectionHandler } from "relay-runtime";
-import PaginatedQueue from "pages/queue/paginated";
+import QueueAll from "pages/queue/all";
+import QueueCurrent from "pages/queue/current";
 
 const RequestListContainer = styled.ul`
   position: absolute;
@@ -18,11 +21,32 @@ const RequestListContainer = styled.ul`
   scrollbar-width: none;
 `;
 
-const QueueQuery = graphql`
-  query queueQuery($first: Int, $after: String, $status: String) {
+const QueueAllQuery = graphql`
+  query queueAllQuery(
+    $first: Int
+    $after: String
+    $last: Int
+    $before: String
+    $status: String
+  ) {
     queue {
       id
-      ...paginatedQueueFragment
+      ...allQueueFragment
+    }
+  }
+`;
+
+const QueueCurrentQuery = graphql`
+  query queueCurrentQuery(
+    $first: Int
+    $after: String
+    $last: Int
+    $before: String
+    $status: String
+  ) {
+    queue {
+      id
+      ...currentQueueFragment
     }
   }
 `;
@@ -38,20 +62,46 @@ const QueueSubscription = graphql`
   }
 `;
 
-const Queue = ({ preloadedQuery }) => {
-  const { queue } = usePreloadedQuery(QueueQuery, preloadedQuery);
+const Queue = (props) => {
+  const preloadedAllQueueQuery = useMemo(
+    () =>
+      preloadQuery(RelayEnvironment, QueueAllQuery, {
+        first: 10,
+      }),
+    []
+  );
+
+  const preloadedCurrentQueueQuery = useMemo(
+    () =>
+      preloadQuery(RelayEnvironment, QueueCurrentQuery, {
+        last: 1,
+        status: "accepted",
+      }),
+    []
+  );
+
+  const { queue: queueAll } = usePreloadedQuery(
+    QueueAllQuery,
+    preloadedAllQueueQuery
+  );
+
+  const { queue: queueCurrent } = usePreloadedQuery(
+    QueueCurrentQuery,
+    preloadedCurrentQueueQuery
+  );
 
   useSubscription(
     React.useMemo(
       () => ({
         subscription: QueueSubscription,
         updater: (store) => {
-          const root = store.getRoot().getLinkedRecord("queue");
-
           const request = store.getRootField("addRequest");
+          const root = store.getRoot();
+          const queue = root.getLinkedRecord("queue");
+
           const requests = ConnectionHandler.getConnection(
-            root,
-            "queueQuery_requests"
+            queue,
+            "allQueueQuery_requests"
           );
 
           ConnectionHandler.insertEdgeAfter(
@@ -64,9 +114,13 @@ const Queue = ({ preloadedQuery }) => {
     )
   );
 
+  const currentRoute = useRouteMatch("/queue/current") !== null;
+  const allRoute = useRouteMatch("/queue").isExact;
+
   return (
     <RequestListContainer>
-      <PaginatedQueue queue={queue} />
+      {currentRoute && <QueueCurrent queue={queueCurrent} />}
+      {allRoute && <QueueAll queue={queueAll} />}
     </RequestListContainer>
   );
 };

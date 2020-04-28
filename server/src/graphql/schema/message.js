@@ -3,6 +3,7 @@ const {
   helpers: { allRows, firstRow, toCamelCase },
 } = require("../../db");
 const { offsetToCursor } = require("./connection");
+const { addUser } = require("../../db/helpers/user");
 const { addMessage } = require("../../db/helpers/message");
 
 const types = `
@@ -25,8 +26,18 @@ const types = `
     message(id: ID!): Message
   }
 
+  input AddMessageInput {
+    twitchId: ID!
+    message: String
+    emotes: String
+  }
+
+  type AddMessagePayload {
+    message: MessageEdge
+  }
+
   extend type Mutation {
-    addMessage(userId: ID!, message: String, emotes: String): MessageEdge
+    addMessage(input: AddMessageInput!): AddMessagePayload
   }
 
   extend type Subscription {
@@ -71,21 +82,30 @@ module.exports = {
       },
     },
     Mutation: {
-      addMessage: (parent, { userId, message, emotes }, context, info) =>
-        addMessage(userId, message, emotes).then((data) => {
-          const { usersId, ...message } = data;
+      addMessage: (
+        parent,
+        { input: { twitchId, message, emotes } },
+        context,
+        info
+      ) =>
+        addUser(twitchId).then((user) =>
+          addMessage(user.id, message, emotes).then((data) => {
+            const { usersId, ...message } = data;
 
-          const edge = {
-            cursor: offsetToCursor(message.id),
-            node: {
-              ...toCamelCase(message),
-            },
-          };
+            const edge = {
+              cursor: offsetToCursor(message.id),
+              node: {
+                ...toCamelCase(message),
+              },
+            };
 
-          pubsub.publish(MESSAGE_ADDED, { addMessage: edge });
+            pubsub.publish(MESSAGE_ADDED, { addMessage: edge });
 
-          return edge;
-        }),
+            return {
+              message: edge,
+            };
+          })
+        ),
     },
   }),
 };

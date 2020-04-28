@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash d7aaac0670550dd2ddd306583fe84478
+ * @relayHash 556bbff5a5665bff3cb7b60e25824580
  */
 
 /* eslint-disable */
@@ -15,7 +15,11 @@ export type chatSubscriptionResponse = {|
   +addMessage: ?{|
     +cursor: string,
     +node: ?{|
-      +$fragmentRefs: messageMessage$ref
+      +user: ?{|
+        +username: ?string,
+        +avatar: ?string,
+      |},
+      +$fragmentRefs: messageMessage$ref,
     |},
   |}
 |};
@@ -31,6 +35,11 @@ subscription chatSubscription {
   addMessage {
     cursor
     node {
+      user {
+        username
+        avatar
+        id
+      }
       ...messageMessage
       id
     }
@@ -48,6 +57,27 @@ var v0 = {
   "kind": "ScalarField",
   "alias": null,
   "name": "cursor",
+  "args": null,
+  "storageKey": null
+},
+v1 = {
+  "kind": "ScalarField",
+  "alias": null,
+  "name": "username",
+  "args": null,
+  "storageKey": null
+},
+v2 = {
+  "kind": "ScalarField",
+  "alias": null,
+  "name": "avatar",
+  "args": null,
+  "storageKey": null
+},
+v3 = {
+  "kind": "ScalarField",
+  "alias": null,
+  "name": "id",
   "args": null,
   "storageKey": null
 };
@@ -79,6 +109,19 @@ return {
             "concreteType": "Message",
             "plural": false,
             "selections": [
+              {
+                "kind": "LinkedField",
+                "alias": null,
+                "name": "user",
+                "storageKey": null,
+                "args": null,
+                "concreteType": "User",
+                "plural": false,
+                "selections": [
+                  (v1/*: any*/),
+                  (v2/*: any*/)
+                ]
+              },
               {
                 "kind": "FragmentSpread",
                 "name": "messageMessage",
@@ -115,6 +158,20 @@ return {
             "plural": false,
             "selections": [
               {
+                "kind": "LinkedField",
+                "alias": null,
+                "name": "user",
+                "storageKey": null,
+                "args": null,
+                "concreteType": "User",
+                "plural": false,
+                "selections": [
+                  (v1/*: any*/),
+                  (v2/*: any*/),
+                  (v3/*: any*/)
+                ]
+              },
+              {
                 "kind": "ScalarField",
                 "alias": null,
                 "name": "message",
@@ -128,13 +185,7 @@ return {
                 "args": null,
                 "storageKey": null
               },
-              {
-                "kind": "ScalarField",
-                "alias": null,
-                "name": "id",
-                "args": null,
-                "storageKey": null
-              }
+              (v3/*: any*/)
             ]
           }
         ]
@@ -145,12 +196,12 @@ return {
     "operationKind": "subscription",
     "name": "chatSubscription",
     "id": null,
-    "text": "subscription chatSubscription {\n  addMessage {\n    cursor\n    node {\n      ...messageMessage\n      id\n    }\n  }\n}\n\nfragment messageMessage on Message {\n  message\n  emotes\n}\n",
+    "text": "subscription chatSubscription {\n  addMessage {\n    cursor\n    node {\n      user {\n        username\n        avatar\n        id\n      }\n      ...messageMessage\n      id\n    }\n  }\n}\n\nfragment messageMessage on Message {\n  message\n  emotes\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '4518496a628a6bf813c3dbf31ad88df9';
+(node/*: any*/).hash = 'a0e789fdaa265d1cd52f3ee46923ca7b';
 
 module.exports = node;

@@ -59,12 +59,33 @@ const createRequest = (type, id, args) => {
     .catch((error) => console.log(error));
 };
 
-const logMessage = (tags, message) =>
-  axios.post("/messages", {
-    twitchid: tags["user-id"],
-    emotes: tags["emotes-raw"],
-    message,
-  });
+const logMessage = (tags, message) => {
+  return axios
+    .post("/graphql", {
+      query: `
+      mutation AddMessage($input: AddMessageInput!) {
+        addMessage(input: $input) {
+          message {
+            node {
+              message
+              emotes
+            }
+          }
+        }
+      }`,
+      variables: {
+        input: {
+          twitchId: tags["user-id"],
+          emotes: tags["emotes-raw"],
+          message,
+        },
+      },
+    })
+    .then((response) => {
+      if (response.success === false) console.log(error);
+    })
+    .catch((error) => console.log(error));
+};
 
 /*
   TODO:

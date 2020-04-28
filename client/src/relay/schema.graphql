@@ -62,6 +62,7 @@ type Query {
   users: [User]
   user(id: ID!): User
   queue: Queue
+  current: Queue
   chat: Chat
   requests(from: Int): [Request]
   request(id: ID, filter: String): Request

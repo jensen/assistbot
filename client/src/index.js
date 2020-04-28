@@ -12,13 +12,12 @@ import "index.scss";
 const Initialize = () =>
   useQueryParameters().get("embed") ? <Embed /> : <Application />;
 
-ReactDOM.render(
+ReactDOM.createRoot(document.getElementById("application")).render(
   <React.StrictMode>
     <RelayEnvironmentProvider environment={RelayEnvironment}>
       <Router>
         <Initialize />
       </Router>
     </RelayEnvironmentProvider>
-  </React.StrictMode>,
-  document.getElementById("application")
+  </React.StrictMode>
 );

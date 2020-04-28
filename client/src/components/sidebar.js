@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useTransition } from "react";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { Menu as MenuIcon } from "components/icons";
 
 const SideBarContainer = styled.div`
@@ -28,28 +28,41 @@ const Separator = styled.div`
   width: 100%;
 `;
 
-const SideBar = () => (
-  <SideBarContainer>
-    <Menu>
-      <Link to="/chat">
-        <MenuItem>
-          <MenuIcon.Chat />
-        </MenuItem>
-      </Link>
-      <Separator />
-      <Link to="/queue">
-        <MenuItem>
-          <MenuIcon.Queue />
-        </MenuItem>
-      </Link>
-      <Separator />
-      <Link to="/queue/current">
-        <MenuItem>
-          <MenuIcon.Current />
-        </MenuItem>
-      </Link>
-    </Menu>
-  </SideBarContainer>
-);
+const MenuButton = ({ to, children }) => {
+  const history = useHistory();
+  const [startTransition, isPending] = useTransition();
+
+  return (
+    <div onClick={() => startTransition(() => history.push(to))}>
+      {children}
+    </div>
+  );
+};
+
+const SideBar = () => {
+  return (
+    <SideBarContainer>
+      <Menu>
+        <MenuButton to="/chat">
+          <MenuItem>
+            <MenuIcon.Chat />
+          </MenuItem>
+        </MenuButton>
+        <Separator />
+        <MenuButton to="/queue">
+          <MenuItem>
+            <MenuIcon.Queue />
+          </MenuItem>
+        </MenuButton>
+        <Separator />
+        <MenuButton to="/queue/current">
+          <MenuItem>
+            <MenuIcon.Current />
+          </MenuItem>
+        </MenuButton>
+      </Menu>
+    </SideBarContainer>
+  );
+};
 
 export default SideBar;

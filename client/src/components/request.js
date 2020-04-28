@@ -13,7 +13,7 @@ import { fadeIntoTime } from "utils/date";
 const statusColorMap = new Map([
   ["created", "#A03333"],
   ["accepted", "#B79312"],
-  ['completed: "#42A033"'],
+  ["completed", "#42A033"],
 ]);
 
 const RequestContainer = styled.li`

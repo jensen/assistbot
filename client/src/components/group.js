@@ -1,6 +1,4 @@
 import * as React from "react";
-import { useFragment } from "react-relay/hooks";
-import graphql from "babel-plugin-relay/macro";
 import styled from "styled-components";
 import Avatar from "components/avatar";
 import Message from "components/message";
@@ -29,7 +27,7 @@ const MessageHeader = styled.div`
 const MessageList = styled.ul`
   display: flex;
   flex-direction: column;
-  padding: 0.25rem 0;
+  padding: 0.5rem 0;
   align-items: ${({ alternate }) => (alternate ? "flex-start" : "flex-end")};
 `;
 
@@ -38,26 +36,37 @@ const UserName = styled.span`
   padding-right: 0.5rem;
 `;
 
-const GroupFragment = graphql`
-  fragment groupGroup on MessageGroup {
-    id
-    messages {
-      ...messageMessage
-    }
-    user {
-      id
-      username
-      avatar
-    }
+const Placeholder = styled.div`
+  background-color: ${({ color }) => color || "#282828"};
+  height: 0.6rem;
+  width: ${({ width }) => width};
+  margin: 0 0.5rem 0.25rem 0.5rem;
+
+  &:last-of-type {
+    margin-bottom: 0;
   }
 `;
 
-const MessageGroup = ({ alternate, ...props }) => {
-  const {
-    messages,
-    user: { username, avatar },
-  } = useFragment(GroupFragment, props.group);
+export const MessageGroupLoading = ({ alternate }) => {
+  const getPercent = () => `${Math.floor(Math.random() * 60) + 20}%`;
 
+  return (
+    <MessageContainer alternate={alternate}>
+      <MessageHeader alternate={alternate}>
+        <Avatar size="24" placeholder />
+        <UserName>&nbsp;</UserName>
+      </MessageHeader>
+
+      <MessageList alternate={alternate}>
+        <Placeholder width={getPercent()} />
+        <Placeholder width={getPercent()} />
+        <Placeholder width={getPercent()} />
+      </MessageList>
+    </MessageContainer>
+  );
+};
+
+const MessageGroup = ({ alternate, username, avatar, messages, ...props }) => {
   return (
     <MessageContainer alternate={alternate}>
       <MessageHeader alternate={alternate}>

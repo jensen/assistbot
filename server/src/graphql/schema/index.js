@@ -1,6 +1,7 @@
-const { PubSub, makeExecutableSchema } = require("apollo-server-express");
+const { makeExecutableSchema } = require("apollo-server-express");
 const merge = require("lodash/merge");
 const { encodeGlobalId, decodeGlobalId } = require("./encoding");
+const { RedisPubSub } = require("graphql-redis-subscriptions");
 
 const {
   db,
@@ -92,8 +93,9 @@ const BaseResolvers = {
   },
   Query: {
     node: (parent, args, context) => {
-      if (args.id === "queue:Queue") {
-        return { id: "queue", __typename: "Queue" };
+      if (args.id.endsWith(":Queue")) {
+        const [id, __typename] = args.id;
+        return { id, __typename };
       }
 
       const { id, __typename } = decodeGlobalId(args.id);
@@ -106,7 +108,7 @@ const BaseResolvers = {
   },
 };
 
-const pubsub = new PubSub();
+const pubsub = new RedisPubSub();
 
 const GlobalIDResolvers = {
   Request: RequestResolvers(pubsub),

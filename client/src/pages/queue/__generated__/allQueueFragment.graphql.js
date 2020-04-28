@@ -8,12 +8,11 @@
 
 /*::
 import type { ReaderFragment } from 'relay-runtime';
-type messageMessage$ref = any;
 type requestRequest$ref = any;
 import type { FragmentReference } from "relay-runtime";
-declare export opaque type paginatedQueueFragment$ref: FragmentReference;
-declare export opaque type paginatedQueueFragment$fragmentType: paginatedQueueFragment$ref;
-export type paginatedQueueFragment = {|
+declare export opaque type allQueueFragment$ref: FragmentReference;
+declare export opaque type allQueueFragment$fragmentType: allQueueFragment$ref;
+export type allQueueFragment = {|
   +id: string,
   +requests: ?{|
     +edges: ?$ReadOnlyArray<?{|
@@ -21,23 +20,16 @@ export type paginatedQueueFragment = {|
         +createdAt: ?string,
         +acceptedAt: ?string,
         +completedAt: ?string,
-        +user: ?{|
-          +username: ?string,
-          +avatar: ?string,
-        |},
-        +messages: ?$ReadOnlyArray<?{|
-          +$fragmentRefs: messageMessage$ref
-        |}>,
         +$fragmentRefs: requestRequest$ref,
       |}
     |}>
   |},
-  +$refType: paginatedQueueFragment$ref,
+  +$refType: allQueueFragment$ref,
 |};
-export type paginatedQueueFragment$data = paginatedQueueFragment;
-export type paginatedQueueFragment$key = {
-  +$data?: paginatedQueueFragment$data,
-  +$fragmentRefs: paginatedQueueFragment$ref,
+export type allQueueFragment$data = allQueueFragment;
+export type allQueueFragment$key = {
+  +$data?: allQueueFragment$data,
+  +$fragmentRefs: allQueueFragment$ref,
   ...
 };
 */
@@ -49,14 +41,14 @@ var v0 = [
 ];
 return {
   "kind": "Fragment",
-  "name": "paginatedQueueFragment",
+  "name": "allQueueFragment",
   "type": "Queue",
   "metadata": {
     "connection": [
       {
-        "count": "first",
-        "cursor": "after",
-        "direction": "forward",
+        "count": null,
+        "cursor": null,
+        "direction": "bidirectional",
         "path": (v0/*: any*/)
       }
     ],
@@ -66,10 +58,13 @@ return {
           "count": "first",
           "cursor": "after"
         },
-        "backward": null,
+        "backward": {
+          "count": "last",
+          "cursor": "before"
+        },
         "path": (v0/*: any*/)
       },
-      "operation": require('./QueuePaginationQuery.graphql.js'),
+      "operation": require('./allQueuePaginationQuery.graphql.js'),
       "fragmentPathInResult": [
         "node"
       ]
@@ -84,6 +79,16 @@ return {
     {
       "kind": "RootArgument",
       "name": "after",
+      "type": "String"
+    },
+    {
+      "kind": "RootArgument",
+      "name": "last",
+      "type": "Int"
+    },
+    {
+      "kind": "RootArgument",
+      "name": "before",
       "type": "String"
     },
     {
@@ -103,7 +108,7 @@ return {
     {
       "kind": "LinkedField",
       "alias": "requests",
-      "name": "__queueQuery_requests_connection",
+      "name": "__allQueueQuery_requests_connection",
       "storageKey": null,
       "args": [
         {
@@ -155,47 +160,6 @@ return {
                   "storageKey": null
                 },
                 {
-                  "kind": "LinkedField",
-                  "alias": null,
-                  "name": "user",
-                  "storageKey": null,
-                  "args": null,
-                  "concreteType": "User",
-                  "plural": false,
-                  "selections": [
-                    {
-                      "kind": "ScalarField",
-                      "alias": null,
-                      "name": "username",
-                      "args": null,
-                      "storageKey": null
-                    },
-                    {
-                      "kind": "ScalarField",
-                      "alias": null,
-                      "name": "avatar",
-                      "args": null,
-                      "storageKey": null
-                    }
-                  ]
-                },
-                {
-                  "kind": "LinkedField",
-                  "alias": null,
-                  "name": "messages",
-                  "storageKey": null,
-                  "args": null,
-                  "concreteType": "Message",
-                  "plural": true,
-                  "selections": [
-                    {
-                      "kind": "FragmentSpread",
-                      "name": "messageMessage",
-                      "args": null
-                    }
-                  ]
-                },
-                {
                   "kind": "ScalarField",
                   "alias": null,
                   "name": "__typename",
@@ -240,6 +204,20 @@ return {
               "name": "hasNextPage",
               "args": null,
               "storageKey": null
+            },
+            {
+              "kind": "ScalarField",
+              "alias": null,
+              "name": "hasPreviousPage",
+              "args": null,
+              "storageKey": null
+            },
+            {
+              "kind": "ScalarField",
+              "alias": null,
+              "name": "startCursor",
+              "args": null,
+              "storageKey": null
             }
           ]
         }
@@ -249,6 +227,6 @@ return {
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'e4bdf1fee2670bab50cd17664f2697be';
+(node/*: any*/).hash = '60213601b87f47ea99952bb9f9e9540d';
 
 module.exports = node;
