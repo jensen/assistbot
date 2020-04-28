@@ -25,8 +25,27 @@ const types = `
     request(id: ID, filter: String): Request
   }
 
+  input AddRequestInput {
+    twitchId: ID!
+    type: String
+    description: String
+    link: String
+  }
+
+  type AddRequestPayload {
+    request: RequestEdge
+  }
+
+  input UpdateRequestInput {
+    id: ID!
+  }
+
+  type UpdateRequestPayload {
+    request: Request
+  }
+
   extend type Mutation {
-    addRequest(userId: ID!, type: String, description: String, link: String): RequestEdge
+    addRequest(input: AddRequestInput!): AddRequestPayload
     acceptRequest(id: ID!): Request
     completeRequest(id: ID!): Request
   }
@@ -106,22 +125,31 @@ module.exports = {
       },
     },
     Mutation: {
-      addRequest: (parent, { userId, type, description, link }, context) =>
-        addRequest(userId, type, description, link).then((data) => {
-          const { usersId, ...request } = data;
+      addRequest: (
+        parent,
+        { input: { twitchId, type, description, link } },
+        context
+      ) =>
+        addUser(twitchId).then((user) =>
+          addRequest(user.id, type, description, link).then((data) => {
+            const { usersId, ...request } = data;
 
-          const edge = {
-            cursor: offsetToCursor(request.id),
-            node: {
-              ...toCamelCase(request),
-            },
-          };
+            console.log(request);
 
-          pubsub.publish(REQUEST_ADDED, { addRequest: edge });
+            const edge = {
+              cursor: offsetToCursor(request.id),
+              node: {
+                ...toCamelCase(request),
+              },
+            };
 
-          return edge;
-        }),
-      acceptRequest: (parent, { id }, context, info) =>
+            pubsub.publish(REQUEST_ADDED, { addRequest: edge });
+
+            return { request: edge };
+          })
+        ),
+
+      acceptRequest: (parent, { input: { id } }, context, info) =>
         db
           .query(
             `
@@ -133,7 +161,7 @@ module.exports = {
             [decodeGlobalId(id).id]
           )
           .then(firstRow),
-      completeRequest: (parent, { id }, context, info) =>
+      completeRequest: (parent, { input: { id } }, context, info) =>
         db
           .query(
             `

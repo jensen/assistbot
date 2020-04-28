@@ -74,7 +74,12 @@ module.exports = {
           .query("SELECT * FROM users WHERE users.id = $1", [
             parent.users_id || parent.usersId,
           ])
-          .then(firstRow),
+          .then(firstRow)
+          .then((user) =>
+            info.operation.operation === "subscription"
+              ? toCamelCase(user)
+              : user
+          ),
     },
     Subscription: {
       addMessage: {
@@ -95,7 +100,9 @@ module.exports = {
             const edge = {
               cursor: offsetToCursor(message.id),
               node: {
-                ...toCamelCase(message),
+                ...toCamelCase({
+                  ...message,
+                }),
               },
             };
 

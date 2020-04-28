@@ -27,6 +27,7 @@ const ChatQuery = graphql`
             id
             user {
               username
+              displayName
               avatar
             }
             message
@@ -46,6 +47,7 @@ const ChatSubscription = graphql`
       node {
         user {
           username
+          displayName
           avatar
         }
         ...messageMessage
@@ -59,6 +61,7 @@ const groupMessagesByUser = (list) => {
   const groups = [
     {
       username: first.user.username,
+      displayName: first.user.displayName,
       avatar: first.user.avatar,
       messages: [{ ...first }],
     },
@@ -72,6 +75,7 @@ const groupMessagesByUser = (list) => {
     if (!groups[groupIndex]) {
       groups[groupIndex] = {
         username: list[i].user.username,
+        displayName: list[i].user.displayName,
         avatar: list[i].user.avatar,
         messages: [],
       };
@@ -140,18 +144,3 @@ const ChatPage = (props) => {
 };
 
 export default ChatPage;
-
-/*
-
-map(
-        ({ node: group }, index) => (
-          <Suspense fallback={<MessagePlaceholder>Loading</MessagePlaceholder>}>
-            <MessageGroup
-              key={group.id}
-              alternate={index % 2 === 0}
-              group={group}
-            />
-          </Suspense>
-        )
-      )
-*/

@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash f13f30ec21d3b78f9a1e2568491e6dae
+ * @relayHash af45be467b56d7001b8f1c983bde8025
  */
 
 /* eslint-disable */
@@ -21,6 +21,7 @@ export type chatQueryResponse = {|
           +id: string,
           +user: ?{|
             +username: ?string,
+            +displayName: ?string,
             +avatar: ?string,
           |},
           +message: ?string,
@@ -49,6 +50,7 @@ query chatQuery(
           id
           user {
             username
+            displayName
             avatar
             id
           }
@@ -99,39 +101,46 @@ v2 = {
 v3 = {
   "kind": "ScalarField",
   "alias": null,
-  "name": "avatar",
+  "name": "displayName",
   "args": null,
   "storageKey": null
 },
 v4 = {
   "kind": "ScalarField",
   "alias": null,
-  "name": "message",
+  "name": "avatar",
   "args": null,
   "storageKey": null
 },
 v5 = {
   "kind": "ScalarField",
   "alias": null,
-  "name": "emotes",
+  "name": "message",
   "args": null,
   "storageKey": null
 },
 v6 = {
   "kind": "ScalarField",
   "alias": null,
-  "name": "__typename",
+  "name": "emotes",
   "args": null,
   "storageKey": null
 },
 v7 = {
   "kind": "ScalarField",
   "alias": null,
-  "name": "cursor",
+  "name": "__typename",
   "args": null,
   "storageKey": null
 },
 v8 = {
+  "kind": "ScalarField",
+  "alias": null,
+  "name": "cursor",
+  "args": null,
+  "storageKey": null
+},
+v9 = {
   "kind": "LinkedField",
   "alias": null,
   "name": "pageInfo",
@@ -156,7 +165,7 @@ v8 = {
     }
   ]
 },
-v9 = [
+v10 = [
   {
     "kind": "Variable",
     "name": "last",
@@ -219,12 +228,13 @@ return {
                         "plural": false,
                         "selections": [
                           (v2/*: any*/),
-                          (v3/*: any*/)
+                          (v3/*: any*/),
+                          (v4/*: any*/)
                         ]
                       },
-                      (v4/*: any*/),
                       (v5/*: any*/),
                       (v6/*: any*/),
+                      (v7/*: any*/),
                       {
                         "kind": "FragmentSpread",
                         "name": "messageMessage",
@@ -232,10 +242,10 @@ return {
                       }
                     ]
                   },
-                  (v7/*: any*/)
+                  (v8/*: any*/)
                 ]
               },
-              (v8/*: any*/)
+              (v9/*: any*/)
             ]
           }
         ]
@@ -261,7 +271,7 @@ return {
             "alias": null,
             "name": "messages",
             "storageKey": null,
-            "args": (v9/*: any*/),
+            "args": (v10/*: any*/),
             "concreteType": "MessageConnection",
             "plural": false,
             "selections": [
@@ -295,25 +305,26 @@ return {
                         "selections": [
                           (v2/*: any*/),
                           (v3/*: any*/),
+                          (v4/*: any*/),
                           (v1/*: any*/)
                         ]
                       },
-                      (v4/*: any*/),
                       (v5/*: any*/),
-                      (v6/*: any*/)
+                      (v6/*: any*/),
+                      (v7/*: any*/)
                     ]
                   },
-                  (v7/*: any*/)
+                  (v8/*: any*/)
                 ]
               },
-              (v8/*: any*/)
+              (v9/*: any*/)
             ]
           },
           {
             "kind": "LinkedHandle",
             "alias": null,
             "name": "messages",
-            "args": (v9/*: any*/),
+            "args": (v10/*: any*/),
             "handle": "connection",
             "key": "chatQuery_messages",
             "filters": null
@@ -326,7 +337,7 @@ return {
     "operationKind": "query",
     "name": "chatQuery",
     "id": null,
-    "text": "query chatQuery(\n  $last: Int\n) {\n  chat {\n    messages(last: $last) {\n      edges {\n        node {\n          id\n          user {\n            username\n            avatar\n            id\n          }\n          message\n          emotes\n          ...messageMessage\n          __typename\n        }\n        cursor\n      }\n      pageInfo {\n        hasPreviousPage\n        startCursor\n      }\n    }\n  }\n}\n\nfragment messageMessage on Message {\n  message\n  emotes\n}\n",
+    "text": "query chatQuery(\n  $last: Int\n) {\n  chat {\n    messages(last: $last) {\n      edges {\n        node {\n          id\n          user {\n            username\n            displayName\n            avatar\n            id\n          }\n          message\n          emotes\n          ...messageMessage\n          __typename\n        }\n        cursor\n      }\n      pageInfo {\n        hasPreviousPage\n        startCursor\n      }\n    }\n  }\n}\n\nfragment messageMessage on Message {\n  message\n  emotes\n}\n",
     "metadata": {
       "connection": [
         {
@@ -344,6 +355,6 @@ return {
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '81a982ee9e44fc1bf74ac1eec1564e4d';
+(node/*: any*/).hash = 'a6aa38d3181c83ba4a6df805c3e19903';
 
 module.exports = node;

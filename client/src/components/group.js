@@ -66,12 +66,18 @@ export const MessageGroupLoading = ({ alternate }) => {
   );
 };
 
-const MessageGroup = ({ alternate, username, avatar, messages, ...props }) => {
+const MessageGroup = ({
+  alternate,
+  displayName,
+  avatar,
+  messages,
+  ...props
+}) => {
   return (
     <MessageContainer alternate={alternate}>
       <MessageHeader alternate={alternate}>
         <Avatar size="24" avatar={avatar} />
-        <UserName>{username}</UserName>
+        <UserName>{displayName}</UserName>
       </MessageHeader>
 
       <MessageList alternate={alternate}>

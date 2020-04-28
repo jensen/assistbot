@@ -1,3 +1,24 @@
+input AddMessageInput {
+  twitchId: ID!
+  message: String
+  emotes: String
+}
+
+type AddMessagePayload {
+  message: MessageEdge
+}
+
+input AddRequestInput {
+  twitchId: ID!
+  type: String
+  description: String
+  link: String
+}
+
+type AddRequestPayload {
+  request: RequestEdge
+}
+
 type Chat {
   groups(first: Int, after: String, last: Int, before: String): MessageGroupConnection
   messages(first: Int, after: String, last: Int, before: String): MessageConnection
@@ -40,10 +61,10 @@ type MessageGroupEdge {
 type Mutation {
   _empty: String
   addUser(twitchId: String!): User
-  addRequest(userId: ID!, type: String, description: String, link: String): RequestEdge
+  addRequest(input: AddRequestInput!): AddRequestPayload
   acceptRequest(id: ID!): Request
   completeRequest(id: ID!): Request
-  addMessage(userId: ID!, message: String, emotes: String): MessageEdge
+  addMessage(input: AddMessageInput!): AddMessagePayload
 }
 
 interface Node {
@@ -104,9 +125,18 @@ type Subscription {
   addMessage: MessageEdge
 }
 
+input UpdateRequestInput {
+  id: ID!
+}
+
+type UpdateRequestPayload {
+  request: Request
+}
+
 type User implements Node {
   id: ID!
   username: String
+  displayName: String
   avatar: String
   twitchId: String
   requests(first: Int, after: String, last: Int, before: String): RequestConnection

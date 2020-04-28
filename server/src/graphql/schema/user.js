@@ -9,6 +9,7 @@ const types = `
   type User implements Node {
     id: ID!
     username: String
+    displayName: String
     avatar: String
     twitchId: String
     requests(first: Int, after: String, last: Int, before: String): RequestConnection

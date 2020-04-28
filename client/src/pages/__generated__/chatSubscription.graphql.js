@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 556bbff5a5665bff3cb7b60e25824580
+ * @relayHash 893d1414325c6991804b9c67bb0b58d0
  */
 
 /* eslint-disable */
@@ -17,6 +17,7 @@ export type chatSubscriptionResponse = {|
     +node: ?{|
       +user: ?{|
         +username: ?string,
+        +displayName: ?string,
         +avatar: ?string,
       |},
       +$fragmentRefs: messageMessage$ref,
@@ -37,6 +38,7 @@ subscription chatSubscription {
     node {
       user {
         username
+        displayName
         avatar
         id
       }
@@ -70,11 +72,18 @@ v1 = {
 v2 = {
   "kind": "ScalarField",
   "alias": null,
-  "name": "avatar",
+  "name": "displayName",
   "args": null,
   "storageKey": null
 },
 v3 = {
+  "kind": "ScalarField",
+  "alias": null,
+  "name": "avatar",
+  "args": null,
+  "storageKey": null
+},
+v4 = {
   "kind": "ScalarField",
   "alias": null,
   "name": "id",
@@ -119,7 +128,8 @@ return {
                 "plural": false,
                 "selections": [
                   (v1/*: any*/),
-                  (v2/*: any*/)
+                  (v2/*: any*/),
+                  (v3/*: any*/)
                 ]
               },
               {
@@ -168,7 +178,8 @@ return {
                 "selections": [
                   (v1/*: any*/),
                   (v2/*: any*/),
-                  (v3/*: any*/)
+                  (v3/*: any*/),
+                  (v4/*: any*/)
                 ]
               },
               {
@@ -185,7 +196,7 @@ return {
                 "args": null,
                 "storageKey": null
               },
-              (v3/*: any*/)
+              (v4/*: any*/)
             ]
           }
         ]
@@ -196,12 +207,12 @@ return {
     "operationKind": "subscription",
     "name": "chatSubscription",
     "id": null,
-    "text": "subscription chatSubscription {\n  addMessage {\n    cursor\n    node {\n      user {\n        username\n        avatar\n        id\n      }\n      ...messageMessage\n      id\n    }\n  }\n}\n\nfragment messageMessage on Message {\n  message\n  emotes\n}\n",
+    "text": "subscription chatSubscription {\n  addMessage {\n    cursor\n    node {\n      user {\n        username\n        displayName\n        avatar\n        id\n      }\n      ...messageMessage\n      id\n    }\n  }\n}\n\nfragment messageMessage on Message {\n  message\n  emotes\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'a0e789fdaa265d1cd52f3ee46923ca7b';
+(node/*: any*/).hash = '4452d7b92a42e936e7d0fa72ee04c8fa';
 
 module.exports = node;
